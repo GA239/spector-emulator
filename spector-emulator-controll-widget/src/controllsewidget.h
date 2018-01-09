@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QScrollBar>
+#include <QLabel>
 
 class ControllSEWidget : public QWidget
 {
@@ -11,17 +12,28 @@ class ControllSEWidget : public QWidget
 public:
     ControllSEWidget(QWidget *parent = 0);
     ~ControllSEWidget();
+    int getU1(void);
+    int getU2(void);
 
 signals:
+    void U1Changed(int position);
+    void U2Changed(int position);
 
 public slots:
 
 protected:
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
-private:
 
+private slots:
+    void U1ChangedPrivateSlot(int value);
+    void U2ChangedPrivateSlot(int value);
+
+private:
     QScrollBar* U1;
+    QScrollBar* U2;
+
+
 };
 
 #endif // CONTROLLSEWIDGET_H

@@ -1,7 +1,9 @@
 #include <QDebug>
-#include <QVBoxLayout>
-
+#include <QGridLayout>
 #include "controllsewidget.h"
+
+#define U_MIN_VALUE  0
+#define U_MAX_VALUE 100
 
 /**
  * @brief Default constructor
@@ -9,29 +11,35 @@
  */
 ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 {
-    /*
-    this->imageLabel = new QLabel(this);
-    this->imageLabel->setBackgroundRole(QPalette::Base);
-    this->imageLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    this->imageLabel->setScaledContents(true);
-    this->imageLabel->setAlignment(Qt::AlignCenter);
-    this->imageLabel->setFocus();
 
-    this->setFrameStyle(QFrame::Plain);
-    this->setLineWidth(0);
-    this->setBackgroundRole(QPalette::Window);
-    this->setWidget(this->imageLabel);
-    this->setAlignment(Qt::AlignCenter);
-
-    this->scaleMode = this->SCALEMODE_FIT_TO_WINDOW;
-    this->scaleFactor = 1.;
-    this->modelPathRole = Qt::DisplayRole;
-
-    */
     this->U1 = new QScrollBar(Qt::Horizontal,parent);
-    QVBoxLayout *verticalLayout = new QVBoxLayout;
-    this->setLayout(verticalLayout);
-    this->layout()->addWidget(this->U1);
+    this->U2 = new QScrollBar(Qt::Horizontal,parent);
+    this->U1->setRange(U_MIN_VALUE,U_MAX_VALUE);
+    this->U2->setRange(U_MIN_VALUE,U_MAX_VALUE);
+
+    QObject::connect(this->U1, SIGNAL(sliderMoved(int)), this, SLOT(U1ChangedPrivateSlot(int)));
+    QObject::connect(this->U2, SIGNAL(sliderMoved(int)), this, SLOT(U2ChangedPrivateSlot(int)));
+
+    QLabel* labelU1 = new QLabel("<font size=24><b>U1</b></font>",parent);
+    labelU1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    QLabel* labelU2 = new QLabel("<font size=24><b>U2</b></font>",parent);
+    labelU2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    this->U1->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    this->U2->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+
+    QGridLayout *layout = new QGridLayout(this);
+
+    QHBoxLayout *horizontLayoutU1 = new QHBoxLayout(parent);
+    horizontLayoutU1->addWidget(this->U1);
+    horizontLayoutU1->addWidget(labelU1);
+
+    QHBoxLayout *horizontLayoutU2 = new QHBoxLayout(parent);
+    horizontLayoutU2->addWidget(this->U2);
+    horizontLayoutU2->addWidget(labelU2);
+
+    layout->addLayout(horizontLayoutU1,0,0);
+    layout->addLayout(horizontLayoutU2,1,0);
 
  }
 
@@ -40,7 +48,17 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
  */
 ControllSEWidget::~ControllSEWidget()
 {
-    delete this->U1;
+
+}
+
+int ControllSEWidget::getU1()
+{
+    return this->U1->value();
+}
+
+int ControllSEWidget::getU2()
+{
+    return this->U2->value();
 }
 
 /**
@@ -74,11 +92,15 @@ void ControllSEWidget::keyPressEvent(QKeyEvent *event)
 void ControllSEWidget::wheelEvent(QWheelEvent *event)
 {
     Q_UNUSED(event);
-    /*
-    if(event->delta() > 0) {
-        this->showNext();
-    } else {
-        this->showPrev();
-    }*/
     return;
+}
+
+void ControllSEWidget::U1ChangedPrivateSlot(int value)
+{
+    emit this->U1Changed(value);
+}
+
+void ControllSEWidget::U2ChangedPrivateSlot(int value)
+{
+    emit this->U2Changed(value);
 }
