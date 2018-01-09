@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = spector-emulator-app
+TARGET = spector-emulator
 TEMPLATE = app
 
 
@@ -18,3 +18,11 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
+
+CONFIG(debug, debug|release) {
+    LIBS+= -L../../spector-emulator-controll-widget/build-spector-emulator-controll-widget-Desktop/debug -lControllSEWidget	
+}
+
+CONFIG(release, debug|release) {
+    LIBS+= -L../../spector-emulator-controll-widget/build-spector-emulator-controll-widget-Desktop/release -lControllSEWidget
+}

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "../../spector-emulator-controll-widget/src/controllsewidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    ControllSEWidget* controll;
 };
 
 #endif // MAINWINDOW_H
