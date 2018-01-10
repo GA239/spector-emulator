@@ -13,34 +13,26 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 {
 
     this->U1 = new QScrollBar(Qt::Horizontal,parent);
-    this->U2 = new QScrollBar(Qt::Horizontal,parent);
     this->U1->setRange(U_MIN_VALUE,U_MAX_VALUE);
-    this->U2->setRange(U_MIN_VALUE,U_MAX_VALUE);
-
+    this->U1->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     QObject::connect(this->U1, SIGNAL(sliderMoved(int)), this, SIGNAL(U1Changed(int)));
+    QLabel* labelU1 = new QLabel("<font size=12><b>U1</b></font>",parent);
+    labelU1->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+
+    this->U2 = new QScrollBar(Qt::Horizontal,parent);
+    this->U2->setRange(U_MIN_VALUE,U_MAX_VALUE);
+    this->U2->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     QObject::connect(this->U2, SIGNAL(sliderMoved(int)), this, SIGNAL(U2Changed(int)));
-
-    QLabel* labelU1 = new QLabel("<font size=24><b>U1</b></font>",parent);
-    labelU1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    QLabel* labelU2 = new QLabel("<font size=24><b>U2</b></font>",parent);
-    labelU2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-    this->U1->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-    this->U2->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    QLabel* labelU2 = new QLabel("<font size=12><b>U2</b></font>",parent);
+    labelU2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
     QGridLayout *layout = new QGridLayout(this);
 
-    QHBoxLayout *horizontLayoutU1 = new QHBoxLayout(parent);
-    horizontLayoutU1->addWidget(this->U1);
-    horizontLayoutU1->addWidget(labelU1);
+    layout->addWidget(this->U1,0,0);
+    layout->addWidget(labelU1,0,1);
 
-    QHBoxLayout *horizontLayoutU2 = new QHBoxLayout(parent);
-    horizontLayoutU2->addWidget(this->U2);
-    horizontLayoutU2->addWidget(labelU2);
-
-    layout->addLayout(horizontLayoutU1,0,0);
-    layout->addLayout(horizontLayoutU2,1,0);
-
+    layout->addWidget(this->U2,1,0);
+    layout->addWidget(labelU2,1,1);
  }
 
 /**

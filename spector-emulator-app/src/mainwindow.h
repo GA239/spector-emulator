@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "../../spector-emulator-controll-widget/src/controllsewidget.h"
+#include "../../spector-emulator-plot-widget/src/plotsewidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -28,9 +29,11 @@ private:
 
     void setValueForU1Lable(int value);
     void setValueForU2Lable(int value);
+    QVector<double> estemateData(int u1, int u2);
 
     Ui::MainWindow *ui;
     ControllSEWidget* controll;
+    PlotSEWidget* plotter;
     QLabel* labelU1dem;
     QLabel* labelU2dem;
 };

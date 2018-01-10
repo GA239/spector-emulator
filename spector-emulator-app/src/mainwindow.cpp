@@ -9,28 +9,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     this->controll =  new ControllSEWidget(parent);
+    this->plotter =  new PlotSEWidget(parent);
+    this->plotter->setPlotData(estemateData(this->controll->getU1() + 2,this->controll->getU2() + 2));
 
     QGridLayout *layout = new QGridLayout(parent);
 
-    QHBoxLayout *horizontalLayout = new QHBoxLayout(parent);
-    horizontalLayout->addWidget(this->controll);
     QObject::connect(this->controll, SIGNAL(U1Changed(int)), this, SLOT(U1ControllChanged(int)));
     QObject::connect(this->controll, SIGNAL(U2Changed(int)), this, SLOT(U2ControllChanged(int)));
 
-    labelU1dem = new QLabel(parent);
-    labelU1dem->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-    labelU2dem = new QLabel(parent);
-    labelU2dem->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 
-    setValueForU1Lable(0);
-    setValueForU2Lable(0);
-
-    QVBoxLayout *horizontLayoutdem = new QVBoxLayout(parent);
-    horizontLayoutdem->addWidget(labelU1dem);
-    horizontLayoutdem->addWidget(labelU2dem);
-
-    layout->addLayout(horizontalLayout,0,0);
-    layout->addLayout(horizontLayoutdem,0,1);
+    layout->addWidget(this->controll,0,0,1,1);
+    layout->addWidget(this->plotter,0,1,2,2);
     this->ui->centralWidget->setLayout(layout);
 
 }
@@ -38,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete this->controll;
+    delete this->plotter;
     delete ui;
 }
 
@@ -53,12 +43,21 @@ void MainWindow::U2ControllChanged(int value)
 
 void MainWindow::setValueForU1Lable(int value)
 {
-    QString str = "<font size=24><b>U1 = " + QString::number(value) + " </b></font>";
-    this->labelU1dem->setText(str);
+    this->plotter->setPlotData(estemateData(value,this->controll->getU2()));
 }
 
 void MainWindow::setValueForU2Lable(int value)
 {
-    QString str = "<font size=24><b>U2 = " + QString::number(value) + " </b></font>";
-    this->labelU2dem->setText(str);
+    this->plotter->setPlotData(estemateData(this->controll->getU1(),value));
+    this->update();
+}
+
+QVector<double> MainWindow::estemateData(int u1, int u2)
+{
+    QVector<double> result(100);
+    for (int i=0; i < 100; ++i)
+    {
+        result[i] = (i - u1) * (i - u1) + u2;
+    }
+    return result;
 }
