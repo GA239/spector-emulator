@@ -17,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(this->controll, SIGNAL(U1Changed(int)), this, SLOT(U1ControllChanged(int)));
     QObject::connect(this->controll, SIGNAL(U2Changed(int)), this, SLOT(U2ControllChanged(int)));
 
-
     labelU1dem = new QLabel(parent);
     labelU1dem->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
     labelU2dem = new QLabel(parent);
@@ -33,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     layout->addLayout(horizontalLayout,0,0);
     layout->addLayout(horizontLayoutdem,0,1);
     this->ui->centralWidget->setLayout(layout);
+
 }
 
 MainWindow::~MainWindow()

@@ -17,8 +17,8 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
     this->U1->setRange(U_MIN_VALUE,U_MAX_VALUE);
     this->U2->setRange(U_MIN_VALUE,U_MAX_VALUE);
 
-    QObject::connect(this->U1, SIGNAL(sliderMoved(int)), this, SLOT(U1ChangedPrivateSlot(int)));
-    QObject::connect(this->U2, SIGNAL(sliderMoved(int)), this, SLOT(U2ChangedPrivateSlot(int)));
+    QObject::connect(this->U1, SIGNAL(sliderMoved(int)), this, SIGNAL(U1Changed(int)));
+    QObject::connect(this->U2, SIGNAL(sliderMoved(int)), this, SIGNAL(U2Changed(int)));
 
     QLabel* labelU1 = new QLabel("<font size=24><b>U1</b></font>",parent);
     labelU1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -95,12 +95,3 @@ void ControllSEWidget::wheelEvent(QWheelEvent *event)
     return;
 }
 
-void ControllSEWidget::U1ChangedPrivateSlot(int value)
-{
-    emit this->U1Changed(value);
-}
-
-void ControllSEWidget::U2ChangedPrivateSlot(int value)
-{
-    emit this->U2Changed(value);
-}

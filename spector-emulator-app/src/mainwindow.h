@@ -16,6 +16,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+signals:
+    //void test(int position);
+
+
 private slots:
     void U1ControllChanged(int value);
     void U2ControllChanged(int value);

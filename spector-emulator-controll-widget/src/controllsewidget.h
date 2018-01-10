@@ -26,8 +26,6 @@ protected:
     void wheelEvent(QWheelEvent *event);
 
 private slots:
-    void U1ChangedPrivateSlot(int value);
-    void U2ChangedPrivateSlot(int value);
 
 private:
     QScrollBar* U1;
