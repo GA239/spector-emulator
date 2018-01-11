@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "../../spector-emulator-controll-widget/src/controllsewidget.h"
-#include "../../spector-emulator-plot-widget/src/plotsewidget.h"
+#include "../spector-emulator-controll-widget/controllsewidget.h"
+#include "../spector-emulator-plot-widget/plotsewidget.h"
 
 namespace Ui {
 class MainWindow;
