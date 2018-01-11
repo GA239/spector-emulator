@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "../spector-emulator-controll-widget/controllsewidget.h"
 #include "../spector-emulator-plot-widget/plotsewidget.h"
+#include "../spector-emulator-data-generator/datagenerator.h"
 #include "../../libs/libqt-searchwidget/include/searchwidget.h"
 
 namespace Ui {
@@ -19,8 +20,6 @@ public:
     ~MainWindow();
 
 signals:
-    //void test(int position);
-
 
 private slots:
     void U1ControllChanged(int value);
@@ -36,6 +35,7 @@ private:
     ControllSEWidget* controll;
     PlotSEWidget* plotter;
     SearchWidget *searchWidget;
+    DataGenerator* generator;
 };
 
 #endif // MAINWINDOW_H

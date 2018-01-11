@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->controll =  new ControllSEWidget(parent);
     this->plotter =  new PlotSEWidget(parent);
     this->plotter->setPlotData(estemateData(this->controll->getU1() + 2,this->controll->getU2() + 2));
+    this->generator = new DataGenerator();
 
     QGridLayout *layout = new QGridLayout(parent);
 
@@ -49,6 +50,8 @@ MainWindow::~MainWindow()
 {
     delete this->controll;
     delete this->plotter;
+    delete this->generator;
+    delete this->searchWidget;
     delete ui;
 }
 
@@ -75,10 +78,5 @@ void MainWindow::setValueForU2Lable(int value)
 
 QVector<double> MainWindow::estemateData(int u1, int u2)
 {
-    QVector<double> result(100);
-    for (int i=0; i < 100; ++i)
-    {
-        result[i] = (i - u1) * (i - u1) + u2;
-    }
-    return result;
+    return this->generator->estemateData(u1,u2);
 }

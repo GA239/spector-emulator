@@ -2,8 +2,8 @@
 #include <QGridLayout>
 #include "controllsewidget.h"
 
-#define U_MIN_VALUE  0
-#define U_MAX_VALUE 100
+#define U_MIN_VALUE 250
+#define U_MAX_VALUE 1000
 
 /**
  * @brief Default constructor

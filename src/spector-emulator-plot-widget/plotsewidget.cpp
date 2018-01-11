@@ -23,8 +23,8 @@ PlotSEWidget::PlotSEWidget(QWidget *parent) : QWidget(parent)
     customPlot->xAxis->setLabel("x");
     customPlot->yAxis->setLabel("y");
     // set axes ranges, so we see all data:
-    customPlot->xAxis->setRange(0, 100);
-    customPlot->yAxis->setRange(0, 100);
+    customPlot->xAxis->setRange(0, 5000);
+    customPlot->yAxis->setRange(0, 50);
 
     customPlot->replot();
 
@@ -39,8 +39,8 @@ PlotSEWidget::~PlotSEWidget()
 
 void PlotSEWidget::setPlotData(QVector<double> values)
 {
-    QVector<double> x(100);
-    for(unsigned int i = 0; i < 100; ++i)
+    QVector<double> x(4999);
+    for(unsigned int i = 0; i < 4999; ++i)
         x[i] = i;
 
     customPlot->graph(0)->setData(x, values);
