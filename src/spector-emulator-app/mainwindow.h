@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "../spector-emulator-controll-widget/controllsewidget.h"
 #include "../spector-emulator-plot-widget/plotsewidget.h"
+#include "../../libs/libqt-searchwidget/include/searchwidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -34,8 +35,7 @@ private:
     Ui::MainWindow *ui;
     ControllSEWidget* controll;
     PlotSEWidget* plotter;
-    QLabel* labelU1dem;
-    QLabel* labelU2dem;
+    SearchWidget *searchWidget;
 };
 
 #endif // MAINWINDOW_H

@@ -26,6 +26,14 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
     QLabel* labelU2 = new QLabel("<font size=12><b>U2</b></font>",parent);
     labelU2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
+    // устанавливаем цвет фона
+    QPalette Pal(palette());
+    Pal.setColor(QPalette::Base, Qt::white);
+    this->U2->setAutoFillBackground(true);
+    this->U2->setPalette(Pal);
+    this->U2->setBackgroundRole(QPalette::Light);
+
+
     QGridLayout *layout = new QGridLayout(this);
 
     layout->addWidget(this->U1,0,0);
