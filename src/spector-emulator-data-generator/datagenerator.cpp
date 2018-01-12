@@ -8,22 +8,50 @@
  */
 DataGenerator::DataGenerator()
 {
-
- }
+    gases.insert(28, 1.0);
+    gases.insert(32, 0.3);
+    gases.insert(14, 0.2);
+}
 
 /**
  * @brief DataGenerator::~DataGenerator
  */
 DataGenerator::~DataGenerator()
 {
-
 }
 
-QVector<double> DataGenerator::estemateData(int u1, int u2)
+QVector<double> DataGenerator::getData(const int u1, const int u2, QVector<int> M)
 {
-    int M = 28;
-    int Uis = 600;
-    int Uik	= 216;
+    QVector<double> result;
+    for(int i = 0; i < M.length(); ++i)
+    {
+        if(!gases.contains(M[i]))
+            return result;
+    }
+    QVector<QVector<double> > tmp = estemateData(u1,u2,M);
+    result.resize(tmp[0].length());
+    for(int j = 0; j < result.length(); ++j)
+    {
+        result[j] = 0;
+    }
+    for(int i = 0; i < M.length(); ++i)
+    {
+        for(int j = 0; j < result.length(); ++j)
+        {
+            result[j]+= tmp[i][j] * gases.value(M[i]);
+        }
+    }
+    return result;
+}
+
+QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2, QVector<int> M)
+{
+    Params p;
+    p.Uik = 216;
+    p.Uis = 600;
+    p.Um1 = u1;
+    p.Um2 = u2;
+    p.M = M;
 
     //generate a normal ion distribution
     double mu = 2.5;
@@ -35,51 +63,70 @@ QVector<double> DataGenerator::estemateData(int u1, int u2)
     std::normal_distribution<double> distribution(mu,sigma);
 
     QVector<double> x(nrolls);
-    QVector<double> ystart(nrolls);
-    QVector<double> y;
+    QVector<QVector<double> > ystart;
+    QVector<QVector<double> > y;
+
+    ystart.resize(p.M.length());
+    y.resize(p.M.length());
+
+    for (int i=0; i<p.M.length(); ++i) {
+        ystart[i].reserve(nrolls);
+    }
 
     for (int i=0; i<nrolls; ++i) {
         x[i] = distribution(generator);
     }
 
-    int noZeroTofIndex = 0;
-
-    for  (int i=0; i<nrolls; ++i) {
+    QVector<double> tmp;
+    for  (int j=0; j<nrolls; ++j) {
 
         //estimate the flight time for each ion
-        ystart[i] = tof( x[i], M, Uis, u1, u2, Uik );
-
-        if (ystart[i] != 0){
-            //y[noZeroTofIndex] = ystart[i];
-            y.push_back(ystart[i]);
-            noZeroTofIndex = noZeroTofIndex + 1;
-        }
-    }
-    QVector<double> ydiaposon(5000);
-    QVector<double> result(5000 - 1);
-
-    for  (int i=0; i<5000 - 1; ++i) {
-        ydiaposon[i] = i*2;
-        //result = zeros(1,length(ydiaposon)-1);
-        result[i] = 0;
-    }
-    ydiaposon[5000 - 1] = (5000 - 1)*2;
-
-    //create a histogram of flight time
-    for  (int i=0; i<result.length(); ++i) {
-        for  (int j=0; j < y.length(); ++j) {
-            if( (y[j] > ydiaposon[i]) && (y[j] <= ydiaposon[i+1])){
-               result[i] = result[i] + 1;
+        p.x = x[j];
+        tmp = tof(p);
+        //ystart[i][j] = tof( x[j], M[i], Uis, u1, u2, Uik );
+        for  (int i=0; i<tmp.length(); ++i) {
+            if (tmp[i] != 0){
+                y[i].push_back(tmp[i]);
             }
         }
     }
+    QVector<double> ydiaposon;
+    ydiaposon.resize(5000 + 2);
+    // set grid
+    for  (int i=0; i<ydiaposon.length(); ++i) {
+        ydiaposon[i] = i*2;
+    }
+
+    QVector<QVector<double> > result;
+
+    result.resize(p.M.length());
+
+    for  (int j=0; j<result.length(); ++j)
+    {
+
+        result[j].resize(ydiaposon.length()-1);
+
+        //create a histogram of flight time
+        for  (int i=0; i<result[j].length(); ++i)
+        {
+            result[j][i] = 0;
+            for(int k=0; k < y[j].length(); ++k)
+            {
+                if( (y[j][k] > ydiaposon[i]) && (y[j][k] <= ydiaposon[i+1]))
+                {
+                   result[j][i] = result[j][i] + 1;
+                }
+            }
+        }
+    }
+/*
     for  (int i=0; i<x.length(); ++i) {
         std::cout <<x[i]<< " ";
-    }
+    }*/
     return result;
 }
 
-double DataGenerator::tof(const double x, const int M, const double Uis, const double Um1, const double Um2, const double Uik)
+QVector<double> DataGenerator::tof(const Params &param)
 {
     double Lis = 5.0;
     double Lgap1 = 55.0;
@@ -87,34 +134,45 @@ double DataGenerator::tof(const double x, const int M, const double Uis, const d
     double Lmirr1 = 5.0;
     double Lmirr2 = 15.0;
 
-    if ((x <= 0) || (x > Lis))
-        return 0;
+    QVector<double> result;
+    result.resize(param.M.length());
+    for(int i = 0; i < param.M.length(); ++i){
+        result[i] = 0;
+    }
 
-    double Uion = x / Lis * Uis;
-    if (Uion < Uik)
-        return 0;
+    if ((param.x <= 0) || (param.x > Lis))
+        return result;
 
-    if ((Uion > Um1) && (Uion > Um2))
-        return 0;
+    double Uion = param.x / Lis * param.Uis;
+    if (Uion < param.Uik)
+        return result;
+
+    if ((Uion > param.Um1) && (Uion > param.Um2))
+        return result;
 
     double k = 1.46472222752782E-02;
-    double Vis = k * sqrt(Uion / M);
-    // tof ion guide  v0 = 0
-    double Ti = 2 * x / Vis;
-    double Tg1 = Lgap1 / Vis;
-    double Tg2 = Lgap2 / Vis;
 
-    int Tmirr1,Tmirr2,Vmrr;
+    double Vis,Ti,Tg1,Tg2;
+    double Tmirr1,Tmirr2,Vmrr;
 
-    if (Uion <= Um1){
-        Tmirr1 = 2 * (2 * (Uion / Um1 * Lmirr1) / Vis);
-        Tmirr2 = 0;
+    for(int i = 0; i < param.M.length(); ++i){
+
+        Vis = k * sqrt(Uion / param.M[i]);
+        // tof ion guide  v0 = 0
+        Ti = 2 * param.x / Vis;
+        Tg1 = Lgap1 / Vis;
+        Tg2 = Lgap2 / Vis;
+
+        if (Uion <= param.Um1){
+            Tmirr1 = 2 * (2 * (Uion / param.Um1 * Lmirr1) / Vis);
+            Tmirr2 = 0;
+        }
+        else{
+            Vmrr = k * sqrt((Uion - param.Um1) / param.M[i]);
+            Tmirr1 = 2 * (2 * (Uion / param.Um1 * Lmirr1) / (Vis + Vmrr));
+            Tmirr2 = 2 * (2 * ((Uion - param.Um1) / param.Um2 * Lmirr2) / Vmrr);
+        }
+        result[i] = Ti + Tg1 + Tg2 + Tmirr1 + Tmirr2;
     }
-    else{
-        Vmrr = k * sqrt((Uion - Um1) / M);
-        Tmirr1 = 2 * (2 * (Uion / Um1 * Lmirr1) / (Vis + Vmrr));
-        Tmirr2 = 2 * (2 * ((Uion - Um1) / Um2 * Lmirr2) / Vmrr);
-    }
-
-    return Ti + Tg1 + Tg2 + Tmirr1 + Tmirr2;
+    return result;
 }

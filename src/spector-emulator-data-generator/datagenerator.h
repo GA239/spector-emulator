@@ -1,6 +1,18 @@
 #ifndef DATAGENERATOR_H
 #define DATAGENERATOR_H
 #include <QVector>
+#include <QMap>
+
+typedef struct
+{
+    double x;
+    QVector<int> M;
+    double Uis;
+    double Um1;
+    double Um2;
+    double Uik;
+
+}Params;
 
 class DataGenerator
 {
@@ -8,10 +20,12 @@ class DataGenerator
 public:
     DataGenerator();
     ~DataGenerator();
-    QVector<double> estemateData(int u1, int u2);
+    QVector<double> getData(const int u1, const int u2, QVector<int> M);
 
 private:    
-    double tof(const double x, const int M, const double Uis, const double Um1, const double Um2, const double Uik);
+    QVector<QVector<double> > estemateData(const int u1, const int u2, QVector<int> M);
+    QVector<double> tof(const Params &param);
+    QMap<int,double> gases;
 };
 
 #endif // DATAGENERATOR_H

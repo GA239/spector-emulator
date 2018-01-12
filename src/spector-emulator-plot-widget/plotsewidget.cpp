@@ -39,8 +39,10 @@ PlotSEWidget::~PlotSEWidget()
 
 void PlotSEWidget::setPlotData(QVector<double> values)
 {
-    QVector<double> x(4999);
-    for(unsigned int i = 0; i < 4999; ++i)
+    if(values.empty())
+        return;
+    QVector<double> x(values.length());
+    for(int i = 0; i < values.length(); ++i)
         x[i] = i;
 
     customPlot->graph(0)->setData(x, values);

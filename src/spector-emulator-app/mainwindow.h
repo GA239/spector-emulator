@@ -23,12 +23,12 @@ signals:
 
 private slots:
     void U1ControllChanged(int value);
-    void U2ControllChanged(int value);
+    void U2ControllChanged();
 
 private:
 
     void setValueForU1Lable(int value);
-    void setValueForU2Lable(int value);
+    void setValueForU2Lable();
     QVector<double> estemateData(int u1, int u2);
 
     Ui::MainWindow *ui;

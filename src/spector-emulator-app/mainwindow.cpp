@@ -18,13 +18,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->controll =  new ControllSEWidget(parent);
     this->plotter =  new PlotSEWidget(parent);
-    this->plotter->setPlotData(estemateData(this->controll->getU1() + 2,this->controll->getU2() + 2));
     this->generator = new DataGenerator();
 
     QGridLayout *layout = new QGridLayout(parent);
 
-    QObject::connect(this->controll, SIGNAL(U1Changed(int)), this, SLOT(U1ControllChanged(int)));
-    QObject::connect(this->controll, SIGNAL(U2Changed(int)), this, SLOT(U2ControllChanged(int)));
+    //QObject::connect(this->controll, SIGNAL(U1Changed(int)), this, SLOT(U1ControllChanged(int)));
+    QObject::connect(this->controll, SIGNAL(UChanged()), this, SLOT(U2ControllChanged()));
 
     ///* search widget *///
     QStringListModel *model = new QStringListModel(this);
@@ -44,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     layout->addWidget(this->plotter,0,1,2,2);
     this->ui->centralWidget->setLayout(layout);
 
+    this->plotter->setPlotData(estemateData(this->controll->getU1(),this->controll->getU2()));
+
 }
 
 MainWindow::~MainWindow()
@@ -60,9 +61,9 @@ void MainWindow::U1ControllChanged(int value)
     setValueForU1Lable(value);
 }
 
-void MainWindow::U2ControllChanged(int value)
+void MainWindow::U2ControllChanged()
 {
-    setValueForU2Lable(value);
+    setValueForU2Lable();
 }
 
 void MainWindow::setValueForU1Lable(int value)
@@ -70,13 +71,17 @@ void MainWindow::setValueForU1Lable(int value)
     this->plotter->setPlotData(estemateData(value,this->controll->getU2()));
 }
 
-void MainWindow::setValueForU2Lable(int value)
+void MainWindow::setValueForU2Lable()
 {
-    this->plotter->setPlotData(estemateData(this->controll->getU1(),value));
+    this->plotter->setPlotData(estemateData(this->controll->getU1(),this->controll->getU2()));
     this->update();
 }
 
 QVector<double> MainWindow::estemateData(int u1, int u2)
 {
-    return this->generator->estemateData(u1,u2);
+    QVector<int> M;
+    M.push_back(28);
+    M.push_back(32);
+    M.push_back(14);
+    return this->generator->getData(u1,u2,M);
 }

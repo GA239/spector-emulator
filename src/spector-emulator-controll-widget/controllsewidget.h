@@ -16,8 +16,9 @@ public:
     int getU2(void);
 
 signals:
-    void U1Changed(int position);
-    void U2Changed(int position);
+    //void U1Changed(int position);
+    //void U2Changed(int position);
+    void UChanged();
 
 public slots:
 

@@ -15,14 +15,16 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
     this->U1 = new QScrollBar(Qt::Horizontal,parent);
     this->U1->setRange(U_MIN_VALUE,U_MAX_VALUE);
     this->U1->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    QObject::connect(this->U1, SIGNAL(sliderMoved(int)), this, SIGNAL(U1Changed(int)));
+    //QObject::connect(this->U1, SIGNAL(sliderMoved(int)), this, SIGNAL(U1Changed(int)));
+    QObject::connect(this->U1, SIGNAL(sliderReleased()), this, SIGNAL(UChanged()));
     QLabel* labelU1 = new QLabel("<font size=12><b>U1</b></font>",parent);
     labelU1->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
     this->U2 = new QScrollBar(Qt::Horizontal,parent);
     this->U2->setRange(U_MIN_VALUE,U_MAX_VALUE);
     this->U2->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    QObject::connect(this->U2, SIGNAL(sliderMoved(int)), this, SIGNAL(U2Changed(int)));
+    //QObject::connect(this->U2, SIGNAL(sliderMoved(int)), this, SIGNAL(U2Changed(int)));
+    QObject::connect(this->U2, SIGNAL(sliderReleased()), this, SIGNAL(UChanged()));
     QLabel* labelU2 = new QLabel("<font size=12><b>U2</b></font>",parent);
     labelU2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
