@@ -12,10 +12,12 @@ TARGET = spector-emulator
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp
+SOURCES +=  main.cpp\
+            mainwindow.cpp \
+            countthread.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+            countthread.h
 
 FORMS    += mainwindow.ui
 

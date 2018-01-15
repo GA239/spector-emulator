@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 #include <random>
+#include <QDebug>
+
 /**
  * @brief Default constructor
  */
@@ -44,8 +46,18 @@ QVector<double> DataGenerator::getData(const int u1, const int u2, QVector<int> 
     return result;
 }
 
+void DataGenerator::estimateGasSpector(int u1, int u2, QVector<int> m)
+{
+    emit SendResults(getData(u1, u2, m));
+    emit done();
+}
+
 QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2, QVector<int> M)
 {
+
+    //обеспечивает обработку событий пралельно с выполнением цикла.
+    QCoreApplication::processEvents();
+
     Params p;
     p.Uik = 216;
     p.Uis = 600;
@@ -83,7 +95,6 @@ QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2
         //estimate the flight time for each ion
         p.x = x[j];
         tmp = tof(p);
-        //ystart[i][j] = tof( x[j], M[i], Uis, u1, u2, Uik );
         for  (int i=0; i<tmp.length(); ++i) {
             if (tmp[i] != 0){
                 y[i].push_back(tmp[i]);
@@ -101,6 +112,9 @@ QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2
 
     result.resize(p.M.length());
 
+    int progress = 0;
+    emit progressChanged(progress);
+
     for  (int j=0; j<result.length(); ++j)
     {
 
@@ -117,8 +131,12 @@ QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2
                    result[j][i] = result[j][i] + 1;
                 }
             }
+            progress = (( i + j*result[j].length() ) * 100)/(result.length() * result[j].length());
+            //qDebug() << progress;
+            emit progressChanged(progress);
         }
     }
+    emit progressChanged(100);
 /*
     for  (int i=0; i<x.length(); ++i) {
         std::cout <<x[i]<< " ";

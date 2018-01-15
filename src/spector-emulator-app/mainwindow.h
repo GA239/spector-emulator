@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include "../spector-emulator-controll-widget/controllsewidget.h"
 #include "../spector-emulator-plot-widget/plotsewidget.h"
-#include "../spector-emulator-data-generator/datagenerator.h"
 #include "../../libs/libqt-searchwidget/include/searchwidget.h"
 
 namespace Ui {
@@ -20,22 +19,27 @@ public:
     ~MainWindow();
 
 signals:
+    void estimateGasSpector(int u1, int u2, QVector<int> m);
+
+public slots:
+    void progressSet(int value);
+    void GetResults(QVector<double> results);
 
 private slots:
-    void U1ControllChanged(int value);
-    void U2ControllChanged();
+    void EstimateBottomPressed();
+
 
 private:
 
-    void setValueForU1Lable(int value);
-    void setValueForU2Lable();
+    void estemateNewValues();
     QVector<double> estemateData(int u1, int u2);
 
     Ui::MainWindow *ui;
     ControllSEWidget* controll;
     PlotSEWidget* plotter;
     SearchWidget *searchWidget;
-    DataGenerator* generator;
+    QPushButton* startEstimateBottom;
+    QProgressBar* progressBar;
 };
 
 #endif // MAINWINDOW_H

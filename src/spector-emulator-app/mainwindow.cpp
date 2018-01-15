@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QGridLayout>
+#include <QProgressBar>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -10,20 +11,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setWindowTitle("spector-emulator");
 
-    /*// устанавливаем цвет фона
-    QPalette Pal(palette());
-    Pal.setColor(QPalette::Background, Qt::white);
-    this->setAutoFillBackground(true);
-    this->setPalette(Pal);/*/
-
     this->controll =  new ControllSEWidget(parent);
     this->plotter =  new PlotSEWidget(parent);
-    this->generator = new DataGenerator();
 
     QGridLayout *layout = new QGridLayout(parent);
 
-    //QObject::connect(this->controll, SIGNAL(U1Changed(int)), this, SLOT(U1ControllChanged(int)));
-    QObject::connect(this->controll, SIGNAL(UChanged()), this, SLOT(U2ControllChanged()));
+    //QObject::connect(this->controll, SIGNAL(UChanged()), this, SLOT(ControllChanged()));
 
     ///* search widget *///
     QStringListModel *model = new QStringListModel(this);
@@ -38,12 +31,24 @@ MainWindow::MainWindow(QWidget *parent) :
     this->searchWidget->setSelectionModel(listView->selectionModel());
     this->searchWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    layout->addWidget(this->controll,0,0,1,1);
-    layout->addWidget(this->searchWidget,1,0,1,1);
-    layout->addWidget(this->plotter,0,1,2,2);
+    this->progressBar = new QProgressBar(parent);
+    this->progressBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+    this->progressBar->setRange(0, 100);
+
+    this->startEstimateBottom = new QPushButton(parent);
+    this->startEstimateBottom->setText("Estimate");
+    this->startEstimateBottom->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
+
+    layout->addWidget(this->controll,0,0);
+    layout->addWidget(this->searchWidget,1,0);
+    layout->addWidget(this->plotter,0,1,2,3);
+    layout->addWidget(this->progressBar,2,0,1,2);
+    layout->addWidget(this->startEstimateBottom,2,2);
+
     this->ui->centralWidget->setLayout(layout);
 
-    this->plotter->setPlotData(estemateData(this->controll->getU1(),this->controll->getU2()));
+    //this->plotter->setPlotData(estemateData(this->controll->getU1(),this->controll->getU2()));
 
 }
 
@@ -51,27 +56,32 @@ MainWindow::~MainWindow()
 {
     delete this->controll;
     delete this->plotter;
-    delete this->generator;
     delete this->searchWidget;
     delete ui;
 }
 
-void MainWindow::U1ControllChanged(int value)
+void MainWindow::progressSet(int value)
 {
-    setValueForU1Lable(value);
+    this->progressBar->setValue(value);
 }
 
-void MainWindow::U2ControllChanged()
+void MainWindow::GetResults(QVector<double> results)
 {
-    setValueForU2Lable();
+    this->plotter->setPlotData(results);
+    this->update();
 }
 
-void MainWindow::setValueForU1Lable(int value)
+
+void MainWindow::EstimateBottomPressed()
 {
-    this->plotter->setPlotData(estemateData(value,this->controll->getU2()));
+    QVector<int> M;
+    M.push_back(28);
+    M.push_back(32);
+    M.push_back(14);
+    emit estimateGasSpector(this->controll->getU1(),this->controll->getU2(),M);
 }
 
-void MainWindow::setValueForU2Lable()
+void MainWindow::estemateNewValues()
 {
     this->plotter->setPlotData(estemateData(this->controll->getU1(),this->controll->getU2()));
     this->update();
@@ -83,5 +93,8 @@ QVector<double> MainWindow::estemateData(int u1, int u2)
     M.push_back(28);
     M.push_back(32);
     M.push_back(14);
-    return this->generator->getData(u1,u2,M);
+    QVector<double> result(10);
+    result.fill(1.0);
+    return result;
+    //return this->generator->getData(u1,u2,M);
 }
