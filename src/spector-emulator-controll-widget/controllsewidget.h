@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QScrollBar>
 #include <QLabel>
+#include "../../libs/libqt-searchwidget/include/searchwidget.h"
+
 
 class ControllSEWidget : public QWidget
 {
@@ -14,11 +16,10 @@ public:
     ~ControllSEWidget();
     int getU1(void);
     int getU2(void);
+    void setModelToSearchWidget(QAbstractItemModel *model);
 
 signals:
-    //void U1Changed(int position);
-    //void U2Changed(int position);
-    void UChanged();
+    void Changed();
 
 public slots:
 
@@ -31,7 +32,7 @@ private slots:
 private:
     QScrollBar* U1;
     QScrollBar* U2;
-
+    SearchWidget *searchWidget;
 
 };
 

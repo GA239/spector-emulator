@@ -11,30 +11,19 @@
  */
 ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 {
-
     this->U1 = new QScrollBar(Qt::Horizontal,parent);
     this->U1->setRange(U_MIN_VALUE,U_MAX_VALUE);
     this->U1->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    //QObject::connect(this->U1, SIGNAL(sliderMoved(int)), this, SIGNAL(U1Changed(int)));
-    QObject::connect(this->U1, SIGNAL(sliderReleased()), this, SIGNAL(UChanged()));
+    QObject::connect(this->U1, SIGNAL(valueChanged(int)), this, SIGNAL(Changed()));
     QLabel* labelU1 = new QLabel("<font size=12><b>U1</b></font>",parent);
     labelU1->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
     this->U2 = new QScrollBar(Qt::Horizontal,parent);
     this->U2->setRange(U_MIN_VALUE,U_MAX_VALUE);
     this->U2->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    //QObject::connect(this->U2, SIGNAL(sliderMoved(int)), this, SIGNAL(U2Changed(int)));
-    QObject::connect(this->U2, SIGNAL(sliderReleased()), this, SIGNAL(UChanged()));
+    QObject::connect(this->U2, SIGNAL(valueChanged(int)), this, SIGNAL(Changed()));
     QLabel* labelU2 = new QLabel("<font size=12><b>U2</b></font>",parent);
     labelU2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-
-    // устанавливаем цвет фона
-    QPalette Pal(palette());
-    Pal.setColor(QPalette::Base, Qt::white);
-    this->U2->setAutoFillBackground(true);
-    this->U2->setPalette(Pal);
-    this->U2->setBackgroundRole(QPalette::Light);
-
 
     QGridLayout *layout = new QGridLayout(this);
 
@@ -43,6 +32,13 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 
     layout->addWidget(this->U2,1,0);
     layout->addWidget(labelU2,1,1);
+
+    ///* search widget *///
+    this->searchWidget = new SearchWidget();
+    this->searchWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    layout->addWidget(this->searchWidget,2,0,1,2);
+
  }
 
 /**
@@ -50,7 +46,7 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
  */
 ControllSEWidget::~ControllSEWidget()
 {
-
+    delete this->searchWidget;
 }
 
 int ControllSEWidget::getU1()
@@ -61,6 +57,11 @@ int ControllSEWidget::getU1()
 int ControllSEWidget::getU2()
 {
     return this->U2->value();
+}
+
+void ControllSEWidget::setModelToSearchWidget(QAbstractItemModel *model)
+{
+    this->searchWidget->setModel(model);
 }
 
 /**

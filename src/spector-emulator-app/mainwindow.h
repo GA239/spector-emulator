@@ -4,7 +4,8 @@
 #include <QMainWindow>
 #include "../spector-emulator-controll-widget/controllsewidget.h"
 #include "../spector-emulator-plot-widget/plotsewidget.h"
-#include "../../libs/libqt-searchwidget/include/searchwidget.h"
+#include "../spector-emulator-data-generator/datagenerator.h"
+#include "countthread.h"
 
 namespace Ui {
 class MainWindow;
@@ -22,24 +23,30 @@ signals:
     void estimateGasSpector(int u1, int u2, QVector<int> m);
 
 public slots:
-    void progressSet(int value);
-    void GetResults(QVector<double> results);
 
 private slots:
     void EstimateBottomPressed();
-
+    void progressSet(int value);
+    void GetResults(QVector<double> results);
 
 private:
 
-    void estemateNewValues();
-    QVector<double> estemateData(int u1, int u2);
+    void createAndConfigureElemtsOfWindow(void);
+    void setwidgetAssembly(void);
+    void createThreadEstimation(void);
 
     Ui::MainWindow *ui;
     ControllSEWidget* controll;
     PlotSEWidget* plotter;
-    SearchWidget *searchWidget;
     QPushButton* startEstimateBottom;
     QProgressBar* progressBar;
+
+    //class for parallel (heavy) estimations
+    DataGenerator* generator;
+
+    //The flow in which the estimation will be performed
+    CountThread* worker;
+
 };
 
 #endif // MAINWINDOW_H
