@@ -5,7 +5,8 @@
 
 #include <QObject>
 #include <QCoreApplication>
-//#include <QApplication>
+#include <QItemSelectionModel>
+#include <QStringListModel>
 
 #include <QMutex>
 
@@ -28,7 +29,7 @@ class DataGenerator: public QObject
 public:
     DataGenerator();
     ~DataGenerator();
-    QVector<double> getData(const int u1, const int u2, QVector<int> M);
+    QStringList getModelElemnts();
 
 signals:
     void progressChanged(int progress);
@@ -36,13 +37,18 @@ signals:
     void done();
 
 public slots:
-    void estimateGasSpector(int u1, int u2, QVector<int> m);
+    void estimateGasSpector(QVector<int> U, QModelIndexList M);
     //void stopcc();
 
 private:    
+    QVector<double> getData(const int u1, const int u2, QModelIndexList M);
     QVector<QVector<double> > estemateData(const int u1, const int u2, QVector<int> M);
+    QVector<int> createMassesOfGases(QList<QModelIndex> M);
     QVector<double> tof(const Params &param);
-    QMap<int,double> gases;
+
+    QMap<QModelIndex,QPair<int,double> > gases;
+    QStringListModel *model;
+    QStringList gasesNames;
 };
 
 #endif // DATAGENERATOR_H

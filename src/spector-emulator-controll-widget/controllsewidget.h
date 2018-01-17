@@ -6,7 +6,6 @@
 #include <QLabel>
 #include "../../libs/libqt-searchwidget/include/searchwidget.h"
 
-
 class ControllSEWidget : public QWidget
 {
     Q_OBJECT
@@ -14,9 +13,10 @@ class ControllSEWidget : public QWidget
 public:
     ControllSEWidget(QWidget *parent = 0);
     ~ControllSEWidget();
-    int getU1(void);
-    int getU2(void);
+    int getU(int index);
     void setModelToSearchWidget(QAbstractItemModel *model);
+    QModelIndexList getTagsFromSearchWidget();
+    QVector<int> getUvalues();
 
 signals:
     void Changed();
@@ -28,10 +28,14 @@ protected:
     void wheelEvent(QWheelEvent *event);
 
 private slots:
+    void updateULables(int);
 
 private:
-    QScrollBar* U1;
-    QScrollBar* U2;
+
+    QString getValueStrForUBar(int uIndex, int value);
+
+    QVector<QScrollBar*> U;
+    QVector<QLabel*> ULable;
     SearchWidget *searchWidget;
 
 };

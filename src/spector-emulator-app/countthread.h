@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QVector>
+#include <QItemSelectionModel>
 
 class CountThread : public QThread
 {
@@ -11,13 +12,11 @@ public:
     explicit CountThread(QObject *parent = 0);
 
 signals:
-    //void MonteCarloStarted( int num_sims,  double S,  double K, double r,  double v,  double T, bool type);
-    void estimateGasSpectorStarted(int u1,  int u2, QVector<int> m);
+    void estimateGasSpectorStarted(QVector<int> U, QModelIndexList M);
 
     void stopc();
 public slots:
-    //void MonteCarloStart( int num_sims,  double S,  double K, double r,  double v,  double T, bool type);
-    void estimateGasSpector(int u1,  int u2, QVector<int> m);
+    void estimateGasSpector(QVector<int> U, QModelIndexList M);
 
     void stoc();
 };

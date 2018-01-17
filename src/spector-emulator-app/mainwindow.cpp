@@ -20,7 +20,7 @@ MainWindow::~MainWindow()
     delete this->plotter;
     delete this-> startEstimateBottom;
     delete this-> progressBar;
-    delete this-> generator;
+    //delete this-> generator;
     delete this-> worker;
     delete ui;
 }
@@ -41,8 +41,9 @@ void MainWindow::createThreadEstimation(void)
 
     // соединяем начало расчётов с запуском потока
     qRegisterMetaType<QVector<int> >("QVector<int>");
-    QObject::connect(this, SIGNAL(estimateGasSpector(int,int,QVector<int>)),worker, SLOT(estimateGasSpector(int,int,QVector<int>)));
-    QObject::connect(worker, SIGNAL(estimateGasSpectorStarted(int,int,QVector<int>)), generator, SLOT(estimateGasSpector(int,int,QVector<int>)));
+    qRegisterMetaType<QModelIndexList >("QModelIndexList");
+    QObject::connect(this, SIGNAL(estimateGasSpector(QVector<int>,QModelIndexList)),worker, SLOT(estimateGasSpector(QVector<int>,QModelIndexList)));
+    QObject::connect(worker, SIGNAL(estimateGasSpectorStarted(QVector<int>,QModelIndexList)), generator, SLOT(estimateGasSpector(QVector<int>,QModelIndexList)));
 
     // Обеспечиваем прерывание потока по нажатию кнопки Stop
     //QObject::connect(&w, SIGNAL(Stop()), &worker, SLOT(stoc()));
@@ -51,16 +52,6 @@ void MainWindow::createThreadEstimation(void)
 
 void MainWindow::createAndConfigureElemtsOfWindow()
 {
-    ///* controll widget *///
-    this->controll =  new ControllSEWidget();
-    QStringListModel *model = new QStringListModel(this);
-    model->setStringList(QStringList() << "Item1" << "Item2" << "Item3" << "C" << "C++" << "C#" << "C++" << "php" << "qt");
-    this->controll->setModelToSearchWidget(model);
-    //QObject::connect(this->controll, SIGNAL(Changed()), this, SLOT(ControllChanged()));
-
-    ///* plot widget *///
-    this->plotter =  new PlotSEWidget();
-
     ///* data generator *///
     //class for parallel (heavy) estimations
     this->generator =  new DataGenerator();
@@ -70,6 +61,17 @@ void MainWindow::createAndConfigureElemtsOfWindow()
 
     //connect dataestimation with additional thread
     this->createThreadEstimation();
+
+    ///* controll widget *///
+    this->controll =  new ControllSEWidget();
+    QStringListModel *model = new QStringListModel(this);
+    //model->setStringList(QStringList() << "Item1" << "Item2" << "Item3" << "C" << "C++" << "C#" << "C++" << "php" << "qt");
+    model->setStringList(this->generator->getModelElemnts());
+    this->controll->setModelToSearchWidget(model);
+    //QObject::connect(this->controll, SIGNAL(Changed()), this, SLOT(ControllChanged()));
+
+    ///* plot widget *///
+    this->plotter =  new PlotSEWidget();
 
     ///* estimation status and controll widgets *///
     this->progressBar = new QProgressBar();
@@ -108,9 +110,5 @@ void MainWindow::GetResults(QVector<double> results)
 
 void MainWindow::EstimateBottomPressed()
 {
-    QVector<int> M;
-    M.push_back(28);
-    M.push_back(32);
-    M.push_back(14);
-    emit estimateGasSpector(this->controll->getU1(),this->controll->getU2(),M);
+    emit estimateGasSpector(this->controll->getUvalues(),this->controll->getTagsFromSearchWidget());
 }

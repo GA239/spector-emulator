@@ -10,9 +10,24 @@
  */
 DataGenerator::DataGenerator()
 {
-    gases.insert(28, 1.0);
-    gases.insert(32, 0.3);
-    gases.insert(14, 0.2);
+    QVector<QPair<int,double> > mc;
+
+    gasesNames.append("Item1");
+    mc.append(QPair<int,double>(28, 1.0));
+
+    gasesNames.append("Item2");
+    mc.append(QPair<int,double>(32, 0.3));
+
+    gasesNames.append("Item3");
+    mc.append(QPair<int,double>(14, 0.2));
+
+    model = new QStringListModel(this);
+    model->setStringList(gasesNames);
+
+    for(int i=0;i<model->rowCount();i++){
+      QModelIndex index = model->index(i,0);
+      gases.insert(index,mc[i]);
+    }
 }
 
 /**
@@ -20,17 +35,30 @@ DataGenerator::DataGenerator()
  */
 DataGenerator::~DataGenerator()
 {
+    delete model;
 }
 
-QVector<double> DataGenerator::getData(const int u1, const int u2, QVector<int> M)
+QVector<double> DataGenerator::getData(const int u1, const int u2, QModelIndexList M)
 {
+
+    QList<QModelIndex> tmpIndexList;
     QVector<double> result;
+
     for(int i = 0; i < M.length(); ++i)
     {
-        if(!gases.contains(M[i]))
-            return result;
+        for(int j = 0; j < gases.keys().length(); ++j)
+        {
+            if(gases.keys()[j].data() == M[i].data())
+            {
+                tmpIndexList.append(gases.keys()[j]);
+                break;
+            }
+        }
     }
-    QVector<QVector<double> > tmp = estemateData(u1,u2,M);
+    if(tmpIndexList.empty())
+        return result;
+
+    QVector<QVector<double> > tmp = estemateData(u1,u2,createMassesOfGases(tmpIndexList));
     result.resize(tmp[0].length());
     for(int j = 0; j < result.length(); ++j)
     {
@@ -40,21 +68,35 @@ QVector<double> DataGenerator::getData(const int u1, const int u2, QVector<int> 
     {
         for(int j = 0; j < result.length(); ++j)
         {
-            result[j]+= tmp[i][j] * gases.value(M[i]);
+            result[j]+= tmp[i][j] * gases.value(tmpIndexList[i]).second;
         }
     }
     return result;
 }
 
-void DataGenerator::estimateGasSpector(int u1, int u2, QVector<int> m)
+QStringList DataGenerator::getModelElemnts()
 {
-    emit SendResults(getData(u1, u2, m));
+    return gasesNames;
+}
+
+QVector<int> DataGenerator::createMassesOfGases(QList<QModelIndex> M)
+{
+    QVector<int> result;
+    for (int i = 0; i < M.length(); i++)
+    {
+        result.append(gases.value(M[i]).first);
+    }
+    return result;
+}
+
+void DataGenerator::estimateGasSpector(QVector<int> U, QModelIndexList M)
+{
+    emit SendResults(getData(U[0], U[1], M));
     emit done();
 }
 
 QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2, QVector<int> M)
 {
-
     //обеспечивает обработку событий пралельно с выполнением цикла.
     QCoreApplication::processEvents();
 

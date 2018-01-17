@@ -4,17 +4,10 @@ CountThread::CountThread(QObject *parent) :
     QThread(parent)
 {
 }
-/* запуск расчётов
-void CountThread::MonteCarloStart(int num_sims,  double S,  double K, double r,  double v,  double T, bool type)
+void CountThread::estimateGasSpector(QVector<int> U, QModelIndexList M)
 {
     this->start();
-    emit MonteCarloStarted(num_sims, S, K, r, v, T, type);
-}//*/
-
-void CountThread::estimateGasSpector(int u1, int u2, QVector<int> m)
-{
-    this->start();
-    emit estimateGasSpectorStarted(u1,u2,m);
+    emit estimateGasSpectorStarted(U,M);
 }
 // остановка потока
 void CountThread::stoc()

@@ -3,7 +3,8 @@
 #include "controllsewidget.h"
 
 #define U_MIN_VALUE 250
-#define U_MAX_VALUE 1000
+#define U_MAX_VALUE 999
+#define U_NUMBER 3
 
 /**
  * @brief Default constructor
@@ -11,35 +12,29 @@
  */
 ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 {
-    this->U1 = new QScrollBar(Qt::Horizontal,parent);
-    this->U1->setRange(U_MIN_VALUE,U_MAX_VALUE);
-    this->U1->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    QObject::connect(this->U1, SIGNAL(valueChanged(int)), this, SIGNAL(Changed()));
-    QLabel* labelU1 = new QLabel("<font size=12><b>U1</b></font>",parent);
-    labelU1->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-
-    this->U2 = new QScrollBar(Qt::Horizontal,parent);
-    this->U2->setRange(U_MIN_VALUE,U_MAX_VALUE);
-    this->U2->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    QObject::connect(this->U2, SIGNAL(valueChanged(int)), this, SIGNAL(Changed()));
-    QLabel* labelU2 = new QLabel("<font size=12><b>U2</b></font>",parent);
-    labelU2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-
     QGridLayout *layout = new QGridLayout(this);
+    for(int i = 0; i < U_NUMBER; ++i)
+    {
+        QScrollBar* sb = new QScrollBar(Qt::Horizontal,parent);
+        this->U.push_back(sb);
+        this->U[i]->setRange(U_MIN_VALUE,U_MAX_VALUE);
+        this->U[i]->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+        QObject::connect(this->U[i], SIGNAL(valueChanged(int)), this, SIGNAL(Changed()));
 
-    layout->addWidget(this->U1,0,0);
-    layout->addWidget(labelU1,0,1);
+        QLabel* label = new QLabel(getValueStrForUBar(i+1,U_MIN_VALUE),parent);
+        this->ULable.push_back(label);
+        this->ULable[i]->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+        QObject::connect(this->U[i], SIGNAL(valueChanged(int)), this, SLOT(updateULables(int)));
 
-    layout->addWidget(this->U2,1,0);
-    layout->addWidget(labelU2,1,1);
+        layout->addWidget(this->U[i],i,0);
+        layout->addWidget(this->ULable[i],i,1);
+    }
 
     ///* search widget *///
     this->searchWidget = new SearchWidget();
     this->searchWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-    layout->addWidget(this->searchWidget,2,0,1,2);
-
- }
+    layout->addWidget(this->searchWidget,U_NUMBER,0,1,2);
+}
 
 /**
  * @brief ControllSEWidget::~ControllSEWidget
@@ -47,21 +42,49 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 ControllSEWidget::~ControllSEWidget()
 {
     delete this->searchWidget;
+    for(int i = 0; i < U_NUMBER; ++i)
+    {
+        delete this->U[i];
+        delete this->ULable[i];
+    }
 }
 
-int ControllSEWidget::getU1()
+int ControllSEWidget::getU(int index)
 {
-    return this->U1->value();
+    if(index < U_NUMBER)
+        return this->U[index]->value();
+    return -1;
+}
+QString ControllSEWidget::getValueStrForUBar(int uIndex, int value)
+{
+    float font = 12;
+    QString result = "<font size=" + QString::number(font) + "><b>U" + QString::number(uIndex) + " = " + QString::number(value) + "</b></font>";
+    return result;
 }
 
-int ControllSEWidget::getU2()
+void ControllSEWidget::updateULables(int value)
 {
-    return this->U2->value();
+    Q_UNUSED(value);
+    for(int i = 0; i < U_NUMBER; ++i)
+        this->ULable[i]->setText(getValueStrForUBar(i+1,this->U[i]->value()));
 }
 
 void ControllSEWidget::setModelToSearchWidget(QAbstractItemModel *model)
 {
     this->searchWidget->setModel(model);
+}
+
+QModelIndexList ControllSEWidget::getTagsFromSearchWidget()
+{
+    return this->searchWidget->tags();
+}
+
+QVector<int> ControllSEWidget::getUvalues()
+{
+    QVector<int> result;
+    for(int i = 0; i < U_NUMBER; ++i)
+        result.push_back(this->U[i]->value());
+    return result;
 }
 
 /**

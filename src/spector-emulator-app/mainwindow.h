@@ -20,7 +20,9 @@ public:
     ~MainWindow();
 
 signals:
-    void estimateGasSpector(int u1, int u2, QVector<int> m);
+    //void estimateGasSpector(int u1, int u2, QVector<int> m);
+    void estimateGasSpector(QVector<int> U, QModelIndexList M);
+
 
 public slots:
 
