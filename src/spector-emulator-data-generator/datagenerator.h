@@ -27,9 +27,11 @@ class DataGenerator: public QObject
     Q_OBJECT
 
 public:
-    DataGenerator();
+    DataGenerator(QObject *parent = 0);
     ~DataGenerator();
     QStringList getModelElemnts();
+    bool stopEstimate;
+    static bool bobo;
 
 signals:
     void progressChanged(int progress);
@@ -38,7 +40,8 @@ signals:
 
 public slots:
     void estimateGasSpector(QVector<int> U, QModelIndexList M);
-    //void stopcc();
+    void stopEstimation();
+   // void stopcc();
 
 private:    
     QVector<double> getData(const int u1, const int u2, QModelIndexList M);

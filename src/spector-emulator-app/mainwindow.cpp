@@ -20,16 +20,13 @@ MainWindow::~MainWindow()
     delete this->plotter;
     delete this-> startEstimateBottom;
     delete this-> progressBar;
-    //delete this-> generator;
+    generator->deleteLater();
     delete this-> worker;
     delete ui;
 }
 
 void MainWindow::createThreadEstimation(void)
 {
-    // transfer the calculations to the thread
-    generator->moveToThread(worker);
-
     // Connect progress notifications to progress bar
     QObject::connect(generator, SIGNAL(progressChanged(int)), this, SLOT(progressSet(int)));
     // Connect the transfer of results
@@ -38,23 +35,27 @@ void MainWindow::createThreadEstimation(void)
 
     // Когда выполнение работы закончится - поток должен завершиться
     QObject::connect(generator, SIGNAL(done()), worker, SLOT(quit()));
+    QObject::connect(generator, SIGNAL(done()), this, SLOT(updateProgressbar()));
 
     // соединяем начало расчётов с запуском потока
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QModelIndexList >("QModelIndexList");
     QObject::connect(this, SIGNAL(estimateGasSpector(QVector<int>,QModelIndexList)),worker, SLOT(estimateGasSpector(QVector<int>,QModelIndexList)));
     QObject::connect(worker, SIGNAL(estimateGasSpectorStarted(QVector<int>,QModelIndexList)), generator, SLOT(estimateGasSpector(QVector<int>,QModelIndexList)));
+    //прерывание
+    QObject::connect(worker, SIGNAL(stopEstimationSignal()), generator, SLOT(stopEstimation()));
+    //QObject::connect(worker, SIGNAL(stopEstimationSignal()), generator, SLOT(stopEstimation()));
 
-    // Обеспечиваем прерывание потока по нажатию кнопки Stop
-    //QObject::connect(&w, SIGNAL(Stop()), &worker, SLOT(stoc()));
-    //QObject::connect(&worker, SIGNAL(stopc()), &generator, SLOT(stopcc()));
+    // transfer the calculations to the thread
+    generator->moveToThread(worker);
 }
 
 void MainWindow::createAndConfigureElemtsOfWindow()
 {
     ///* data generator *///
     //class for parallel (heavy) estimations
-    this->generator =  new DataGenerator();
+    DataGenerator::bobo = false;
+    this->generator =  new DataGenerator() ;
 
     //The flow in which the estimation will be performed
     this->worker = new CountThread();
@@ -107,8 +108,29 @@ void MainWindow::GetResults(QVector<double> results)
     this->update();
 }
 
+void MainWindow::bobotreu()
+{
+    DataGenerator::bobo = true;
+}
+
+void MainWindow::updateProgressbar()
+{
+    QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
+    this->startEstimateBottom->setText("Estimate");
+    QObject::disconnect(this->startEstimateBottom, SIGNAL(clicked()), worker, SLOT(stopEstimation()));
+
+}
+
 
 void MainWindow::EstimateBottomPressed()
 {
+    // Обеспечиваем прерывание потока по нажатию кнопки Stop
+    QObject::disconnect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
+    this->startEstimateBottom->setText("Stop");
+    //QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), worker, SLOT(stopEstimation()));
+    QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(bobotreu()));
+
+    //QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), generator, SLOT(stopEstimation()));
+
     emit estimateGasSpector(this->controll->getUvalues(),this->controll->getTagsFromSearchWidget());
 }

@@ -5,12 +5,16 @@
 #include <random>
 #include <QDebug>
 
+bool DataGenerator::bobo;
+
 /**
  * @brief Default constructor
  */
-DataGenerator::DataGenerator()
+DataGenerator::DataGenerator(QObject *parent):
+    QObject(parent)
 {
     QVector<QPair<int,double> > mc;
+    this->stopEstimate = false;
 
     gasesNames.append("Item1");
     mc.append(QPair<int,double>(28, 1.0));
@@ -40,6 +44,7 @@ DataGenerator::~DataGenerator()
 
 QVector<double> DataGenerator::getData(const int u1, const int u2, QModelIndexList M)
 {
+    qDebug() << "getData+";
 
     QList<QModelIndex> tmpIndexList;
     QVector<double> result;
@@ -71,6 +76,7 @@ QVector<double> DataGenerator::getData(const int u1, const int u2, QModelIndexLi
             result[j]+= tmp[i][j] * gases.value(tmpIndexList[i]).second;
         }
     }
+    qDebug() << "getData-";
     return result;
 }
 
@@ -91,14 +97,27 @@ QVector<int> DataGenerator::createMassesOfGases(QList<QModelIndex> M)
 
 void DataGenerator::estimateGasSpector(QVector<int> U, QModelIndexList M)
 {
-    emit SendResults(getData(U[0], U[1], M));
+    qDebug() << "estimateGasSpector";
+    QVector<double> result;
+    this->stopEstimate = false;
+    bobo = false;
+    result = getData(U[0], U[1], M);
+    //if(!this->stopEstimate)
+    if(!bobo)
+        emit SendResults(result);
     emit done();
+}
+
+void DataGenerator::stopEstimation()
+{
+    this->stopEstimate = true;
 }
 
 QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2, QVector<int> M)
 {
+    qDebug() << "estemateData+";
     //обеспечивает обработку событий пралельно с выполнением цикла.
-    QCoreApplication::processEvents();
+    //QCoreApplication::processEvents();
 
     Params p;
     p.Uik = 216;
@@ -176,13 +195,20 @@ QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2
             progress = (( i + j*result[j].length() ) * 100)/(result.length() * result[j].length());
             //qDebug() << progress;
             emit progressChanged(progress);
+            //if (this->stopEstimate)
+            if (bobo)
+            {
+              break;
+            }
         }
     }
+
     emit progressChanged(100);
 /*
     for  (int i=0; i<x.length(); ++i) {
         std::cout <<x[i]<< " ";
     }*/
+    qDebug() << "estemateData-";
     return result;
 }
 

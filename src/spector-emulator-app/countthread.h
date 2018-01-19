@@ -13,12 +13,11 @@ public:
 
 signals:
     void estimateGasSpectorStarted(QVector<int> U, QModelIndexList M);
+    void stopEstimationSignal();
 
-    void stopc();
 public slots:
     void estimateGasSpector(QVector<int> U, QModelIndexList M);
-
-    void stoc();
+    void stopEstimation();
 };
 
 #endif // COUNTTHREAD_H

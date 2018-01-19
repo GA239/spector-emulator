@@ -30,7 +30,8 @@ private slots:
     void EstimateBottomPressed();
     void progressSet(int value);
     void GetResults(QVector<double> results);
-
+    void bobotreu();
+    void updateProgressbar();
 private:
 
     void createAndConfigureElemtsOfWindow(void);
