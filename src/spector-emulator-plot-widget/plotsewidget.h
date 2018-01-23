@@ -13,6 +13,7 @@ public:
     ~PlotSEWidget();
 
     void setPlotData(QVector<double> values);
+    QSharedPointer<QCPGraphDataContainer> getData() const { return customPlot->graph(0)->data(); }
 
 signals:
 

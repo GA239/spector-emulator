@@ -46,14 +46,7 @@ void PlotSEWidget::setPlotData(QVector<double> values)
         x[i] = i;
 
     customPlot->graph(0)->setData(x, values);
-    // give the axes some labels:
-    //customPlot->xAxis->setLabel("x");
-    //customPlot->yAxis->setLabel("y");
-    // set axes ranges, so we see all data:
-    //customPlot->xAxis->setRange(0, 100);
-    //customPlot->yAxis->setRange(0, 1);
     customPlot->replot();
-
 }
 
 /**

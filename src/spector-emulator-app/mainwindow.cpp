@@ -8,10 +8,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("spector-emulator");
 
     this->createAndConfigureElemtsOfWindow();
     this->setwidgetAssembly();
+    this->setWindowTitle("spector-emulator");
+    //this->setStyleSheet( " background-color: white; " );
+
+    QAction *exportData = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/save.png"), "Save Config");
+    connect(exportData, SIGNAL(triggered()), this, SLOT(exportDataSlot()));
+    QAction *saveConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/export.png"), "Export data");
+    connect(saveConfig, SIGNAL(triggered()), this, SLOT(saveConfig()));
+    QAction *loadData = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/load.png"), "Import data");
+    connect(loadData, SIGNAL(triggered()), this, SLOT(loadDataSlot()));
 }
 
 MainWindow::~MainWindow()
@@ -50,6 +58,85 @@ void MainWindow::createThreadEstimation(void)
     generator->moveToThread(worker);
 }
 
+int MainWindow::exportData(QString & resultStr)
+{
+    resultStr = QFileDialog::getSaveFileName(this, tr("Save gas spector"),"gsData",tr("Text (*.txt)"));
+    if(resultStr.isEmpty())
+        return -1;
+    QFile fileOut(resultStr);
+    if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream writeStream(&fileOut);
+        QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData();
+        for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter)
+            writeStream << QString::number(iter->value) << "\n";
+        fileOut.close();
+    }
+    else
+    {
+        //error message
+    }
+    return _RC_SUCCES_;
+}
+
+int MainWindow::saveConfig()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save gas spector"),"gas-spector.gscfg",tr("Text (*.gscfg)"));
+    if(fileName.isEmpty())
+        return -1;
+    QSettings settings( fileName, QSettings::IniFormat );
+    settings.beginGroup( "Controller" );
+
+    QVector<int> controllerValues = this->controll->getUvalues();
+    for(int i = 0; i < controllerValues.length(); ++i)
+        settings.setValue( "U" + QString::number(i) , controllerValues[i]);
+
+    settings.endGroup();
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, tr("question"), tr("Save Gas-Spector data?"),
+                                QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes)
+    {
+        QString dataSrc;
+        if(exportData(dataSrc))
+        {
+            settings.beginGroup( "Data" );
+            settings.setValue( "Path" , dataSrc);
+            settings.endGroup();
+        }
+    }
+    return _RC_SUCCES_;
+}
+
+int MainWindow::exportDataSlot()
+{
+    QString str;
+    return exportData(str);
+}
+
+int MainWindow::loadDataSlot()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                QString::fromUtf8("Select file"),
+                                QDir::currentPath(),
+                                "Text (*.txt);;All files (*.*)");
+    if(fileName.isEmpty())
+        return -1;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly))
+       return -1;
+
+    QTextStream fileStream(&file);
+    QVector<double> values;
+    while(!fileStream.atEnd()) {
+        values.push_back(fileStream.readLine().toDouble());
+    }
+    file.close();
+    this->GetResults(values);
+    return _RC_SUCCES_;
+}
+
 void MainWindow::createAndConfigureElemtsOfWindow()
 {
     ///* data generator *///
@@ -78,10 +165,15 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     this->progressBar = new QProgressBar();
     this->progressBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     this->progressBar->setRange(0, 100);
+    this->progressBar->hide();
 
     this->startEstimateBottom = new QPushButton();
+    QFont font( "Times" );
+    font.setPointSize( 22 );
+    font.setWeight( QFont::Bold );
+    this->startEstimateBottom->setFont(font );
     this->startEstimateBottom->setText("Estimate");
-    this->startEstimateBottom->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    this->startEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
 }
 
@@ -90,8 +182,8 @@ void MainWindow::setwidgetAssembly()
     QGridLayout *layout = new QGridLayout();
     layout->addWidget(this->controll,0,0);
     layout->addWidget(this->plotter,0,1,2,3);
-    layout->addWidget(this->progressBar,2,0,1,2);
-    layout->addWidget(this->startEstimateBottom,2,2);
+    layout->addWidget(this->startEstimateBottom,2,0);
+    layout->addWidget(this->progressBar,2,1,1,3);
 
     this->ui->centralWidget->setLayout(layout);
 }
@@ -118,6 +210,7 @@ void MainWindow::updateProgressbar()
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
     this->startEstimateBottom->setText("Estimate");
     QObject::disconnect(this->startEstimateBottom, SIGNAL(clicked()), worker, SLOT(stopEstimation()));
+    this->progressBar->hide();
 
 }
 
@@ -131,6 +224,6 @@ void MainWindow::EstimateBottomPressed()
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(bobotreu()));
 
     //QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), generator, SLOT(stopEstimation()));
-
+    this->progressBar->show();
     emit estimateGasSpector(this->controll->getUvalues(),this->controll->getTagsFromSearchWidget());
 }

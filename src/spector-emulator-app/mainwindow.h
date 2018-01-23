@@ -7,6 +7,8 @@
 #include "../spector-emulator-data-generator/datagenerator.h"
 #include "countthread.h"
 
+#define _RC_SUCCES_ 1
+
 namespace Ui {
 class MainWindow;
 }
@@ -20,7 +22,6 @@ public:
     ~MainWindow();
 
 signals:
-    //void estimateGasSpector(int u1, int u2, QVector<int> m);
     void estimateGasSpector(QVector<int> U, QModelIndexList M);
 
 
@@ -32,11 +33,15 @@ private slots:
     void GetResults(QVector<double> results);
     void bobotreu();
     void updateProgressbar();
+    int saveConfig();
+    int exportDataSlot();
+    int loadDataSlot();
 private:
 
     void createAndConfigureElemtsOfWindow(void);
     void setwidgetAssembly(void);
     void createThreadEstimation(void);
+    int exportData(QString &resultStr);
 
     Ui::MainWindow *ui;
     ControllSEWidget* controll;
