@@ -5,7 +5,7 @@
 #include <random>
 #include <QDebug>
 
-bool DataGenerator::bobo;
+bool DataGenerator::stopEstimate;
 
 /**
  * @brief Default constructor
@@ -14,7 +14,6 @@ DataGenerator::DataGenerator(QObject *parent):
     QObject(parent)
 {
     QVector<QPair<int,double> > mc;
-    this->stopEstimate = false;
 
     gasesNames.append("N2");
     mc.append(QPair<int,double>(28, 1.0));
@@ -50,14 +49,10 @@ DataGenerator::~DataGenerator()
 {
     delete model;
 }
-
-QVector<double> DataGenerator::getData(const int u1, const int u2, QModelIndexList M)
+QVector<double> DataGenerator::getData(const int u1, const int u2, const int uk, QModelIndexList M)
 {
-    qDebug() << "getData+";
-
     QList<QModelIndex> tmpIndexList;
-    QVector<double> result;
-
+    QVector<double> empty;
     for(int i = 0; i < M.length(); ++i)
     {
         for(int j = 0; j < gases.keys().length(); ++j)
@@ -70,22 +65,15 @@ QVector<double> DataGenerator::getData(const int u1, const int u2, QModelIndexLi
         }
     }
     if(tmpIndexList.empty())
-        return result;
+        return empty;
 
-    QVector<QVector<double> > tmp = estemateData(u1,u2,createMassesOfGases(tmpIndexList));
-    result.resize(tmp[0].length());
-    for(int j = 0; j < result.length(); ++j)
-    {
-        result[j] = 0;
-    }
+    QVector<QVector<double> > tmp = estemateData(u1,u2,uk,createMassesOfGases(tmpIndexList));
+    QVector<double> result(tmp[0].length(),0);
     for(int i = 0; i < M.length(); ++i)
     {
         for(int j = 0; j < result.length(); ++j)
-        {
             result[j]+= tmp[i][j] * gases.value(tmpIndexList[i]).second;
-        }
     }
-    qDebug() << "getData-";
     return result;
 }
 
@@ -98,88 +86,66 @@ QVector<int> DataGenerator::createMassesOfGases(QList<QModelIndex> M)
 {
     QVector<int> result;
     for (int i = 0; i < M.length(); i++)
-    {
         result.append(gases.value(M[i]).first);
-    }
     return result;
 }
 
 void DataGenerator::estimateGasSpector(QVector<int> U, QModelIndexList M)
 {
-    qDebug() << "estimateGasSpector";
     QVector<double> result;
-    this->stopEstimate = false;
-    bobo = false;
-    result = getData(U[0], U[1], M);
-    //if(!this->stopEstimate)
-    if(!bobo)
+    stopEstimate = false;
+    result = getData(U[0], U[1], U[2], M);
+    if(!stopEstimate)
         emit SendResults(result);
     emit done();
 }
 
-void DataGenerator::stopEstimation()
+QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2, const int uk, QVector<int> M)
 {
-    this->stopEstimate = true;
-}
+    Params p(0,M,600,u1,u2,uk);
 
-QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2, QVector<int> M)
-{
-    qDebug() << "estemateData+";
-    //обеспечивает обработку событий пралельно с выполнением цикла.
-    //QCoreApplication::processEvents();
-
-    Params p;
-    p.Uik = 216;
-    p.Uis = 600;
-    p.Um1 = u1;
-    p.Um2 = u2;
-    p.M = M;
-
-    //generate a normal ion distribution
+    // normal dist params
     double mu = 2.5;
     double sigma = 1;
-
     const int nrolls=10000;  // number of experiments
 
     std::default_random_engine generator;
     std::normal_distribution<double> distribution(mu,sigma);
 
-    QVector<double> x(nrolls);
-    QVector<QVector<double> > ystart;
-    QVector<QVector<double> > y;
+    QVector<double> x(nrolls,0);
 
+    QVector<QVector<double> > ystart;
     ystart.resize(p.M.length());
+
+    QVector<QVector<double> > y;
     y.resize(p.M.length());
 
-    for (int i=0; i<p.M.length(); ++i) {
+    for (int i=0; i<p.M.length(); ++i)
         ystart[i].reserve(nrolls);
-    }
 
-    for (int i=0; i<nrolls; ++i) {
+    //generate a normal ion distribution
+    for (int i=0; i<nrolls; ++i)
         x[i] = distribution(generator);
-    }
 
     QVector<double> tmp;
-    for  (int j=0; j<nrolls; ++j) {
-
+    for(int j=0; j<nrolls; ++j)
+    {
         //estimate the flight time for each ion
         p.x = x[j];
         tmp = tof(p);
-        for  (int i=0; i<tmp.length(); ++i) {
-            if (tmp[i] != 0){
+        for  (int i=0; i<tmp.length(); ++i)
+        {
+            if (tmp[i] != 0)
                 y[i].push_back(tmp[i]);
-            }
         }
     }
-    QVector<double> ydiaposon;
-    ydiaposon.resize(5000 + 2);
     // set grid
+    QVector<double> ydiaposon(5000 + 2, 0);
     for  (int i=0; i<ydiaposon.length(); ++i) {
         ydiaposon[i] = i*2;
     }
 
     QVector<QVector<double> > result;
-
     result.resize(p.M.length());
 
     int progress = 0;
@@ -187,7 +153,6 @@ QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2
 
     for  (int j=0; j<result.length(); ++j)
     {
-
         result[j].resize(ydiaposon.length()-1);
 
         //create a histogram of flight time
@@ -202,38 +167,27 @@ QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2
                 }
             }
             progress = (( i + j*result[j].length() ) * 100)/(result.length() * result[j].length());
-            //qDebug() << progress;
             emit progressChanged(progress);
-            //if (this->stopEstimate)
-            if (bobo)
+            if (stopEstimate)
             {
               break;
             }
         }
     }
-
     emit progressChanged(100);
-/*
-    for  (int i=0; i<x.length(); ++i) {
-        std::cout <<x[i]<< " ";
-    }*/
-    qDebug() << "estemateData-";
     return result;
 }
 
 QVector<double> DataGenerator::tof(const Params &param)
 {
+    // function of calculating the flight time of the ion from Oleg
     double Lis = 5.0;
     double Lgap1 = 55.0;
     double Lgap2 = 115.0;
     double Lmirr1 = 5.0;
     double Lmirr2 = 15.0;
 
-    QVector<double> result;
-    result.resize(param.M.length());
-    for(int i = 0; i < param.M.length(); ++i){
-        result[i] = 0;
-    }
+    QVector<double> result(param.M.length(),0);
 
     if ((param.x <= 0) || (param.x > Lis))
         return result;

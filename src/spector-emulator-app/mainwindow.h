@@ -13,6 +13,9 @@ namespace Ui {
 class MainWindow;
 }
 
+///
+/// \brief The MainWindow class - main application window
+///
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -22,19 +25,47 @@ public:
     ~MainWindow();
 
 signals:
+    ///
+    /// \brief estimateGasSpector - signal triggering calculation of the gas spectrum
+    /// \param U - voltages
+    /// \param M - model objects
+    ///
     void estimateGasSpector(QVector<int> U, QModelIndexList M);
 
-
-public slots:
-
 private slots:
+    ///
+    /// \brief EstimateBottomPressed start estimate gas spectrum
+    ///
     void EstimateBottomPressed();
+    ///
+    /// \brief progressSet set value to progress bar
+    /// \param value
+    ///
     void progressSet(int value);
+    ///
+    /// \brief GetResults get results from generator and set it to plotter
+    /// \param results
+    ///
     void GetResults(QVector<double> results);
-    void bobotreu();
+    ///
+    /// \brief stopEstimate terminate estimation
+    ///
+    void stopEstimate();
     void updateProgressbar();
+    ///
+    /// \brief exportConfigSlot expotrt controll params and data to file
+    /// \return
+    ///
     int exportConfigSlot();
+    ///
+    /// \brief importConfigSlot expotrt controll params and data to file
+    /// \return
+    ///
     int importConfigSlot();
+    ///
+    /// \brief saveDataSlot save data to file;
+    /// \return
+    ///
     int saveDataSlot();
 private:
 
@@ -54,7 +85,6 @@ private:
 
     //The flow in which the estimation will be performed
     CountThread* worker;
-
 };
 
 #endif // MAINWINDOW_H

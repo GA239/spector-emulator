@@ -25,9 +25,7 @@ PlotSEWidget::PlotSEWidget(QWidget *parent) : QWidget(parent)
     // set axes ranges, so we see all data:
     customPlot->xAxis->setRange(0, 5000);
     customPlot->yAxis->setRange(0, 50);
-
     customPlot->replot();
-
 }
 
 /**
@@ -41,6 +39,7 @@ void PlotSEWidget::setPlotData(QVector<double> values)
 {
     if(values.empty())
         return;
+    //calculate the abscissas of the gas spectrum
     QVector<double> x(values.length());
     for(int i = 0; i < values.length(); ++i)
         x[i] = i;
@@ -49,37 +48,7 @@ void PlotSEWidget::setPlotData(QVector<double> values)
     customPlot->replot();
 }
 
-/**
- * @brief Action is called when key press widget event ocurs
- * @param event
- */
-void PlotSEWidget::keyPressEvent(QKeyEvent *event)
+QSharedPointer<QCPGraphDataContainer> PlotSEWidget::getData() const
 {
-     Q_UNUSED(event);
-    /*
-    switch (event->key()) {
-        case Qt::Key_Escape: {
-            this->showInWindow();
-        } break;
-        case Qt::Key_Space:
-        case Qt::Key_PageUp: {
-            this->showNext();
-        } break;
-        case Qt::Key_PageDown: {
-            this->showPrev();
-        } break;
-        default: break;
-    }*/
-    return;
+     return customPlot->graph(0)->data();
 }
-
-/**
- * @brief Action is called when mouse wheel widget event ocurs
- * @param event
- */
-void PlotSEWidget::wheelEvent(QWheelEvent *event)
-{
-    Q_UNUSED(event);
-    return;
-}
-

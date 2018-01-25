@@ -2,7 +2,7 @@
 #include <QGridLayout>
 #include "controllsewidget.h"
 
-#define U_MIN_VALUE 250
+#define U_MIN_VALUE 200
 #define U_MAX_VALUE 999
 #define U_NUMBER 3
 
@@ -15,12 +15,14 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
     QGridLayout *layout = new QGridLayout(this);
     for(int i = 0; i < U_NUMBER; ++i)
     {
+        // add scroll bar for each gas
         QScrollBar* sb = new QScrollBar(Qt::Horizontal,parent);
         this->U.push_back(sb);
         this->U[i]->setRange(U_MIN_VALUE,U_MAX_VALUE);
         this->U[i]->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
         QObject::connect(this->U[i], SIGNAL(valueChanged(int)), this, SIGNAL(Changed()));
 
+        // add label bar for each gas
         QLabel* label = new QLabel(getValueStrForUBar(i+1,U_MIN_VALUE),parent);
         this->ULable.push_back(label);
         this->ULable[i]->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -34,7 +36,6 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
     this->searchWidget = new SearchWidget();
     this->searchWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     layout->addWidget(this->searchWidget,U_NUMBER,0,1,2);
-    //this->searchWidget->set
 }
 
 /**
@@ -85,9 +86,7 @@ QStringList ControllSEWidget::getTagsFromSearchWidgetAsStringList()
     QStringList result;
     QModelIndexList tmp = this->searchWidget->tags();
     for(int i = 0; i < tmp.length(); ++i)
-    {
         result.append(tmp[i].data().toString());
-    }
     return result;
 }
 
@@ -132,38 +131,3 @@ void ControllSEWidget::addTags(QStringList gaseList)
     }
     this->searchWidget->addTags(resultList);
 }
-
-/**
- * @brief Action is called when key press widget event ocurs
- * @param event
- */
-void ControllSEWidget::keyPressEvent(QKeyEvent *event)
-{
-     Q_UNUSED(event);
-    /*
-    switch (event->key()) {
-        case Qt::Key_Escape: {
-            this->showInWindow();
-        } break;
-        case Qt::Key_Space:
-        case Qt::Key_PageUp: {
-            this->showNext();
-        } break;
-        case Qt::Key_PageDown: {
-            this->showPrev();
-        } break;
-        default: break;
-    }*/
-    return;
-}
-
-/**
- * @brief Action is called when mouse wheel widget event ocurs
- * @param event
- */
-void ControllSEWidget::wheelEvent(QWheelEvent *event)
-{
-    Q_UNUSED(event);
-    return;
-}
-

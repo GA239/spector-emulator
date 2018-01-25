@@ -9,8 +9,3 @@ void CountThread::estimateGasSpector(QVector<int> U, QModelIndexList M)
     this->start();
     emit estimateGasSpectorStarted(U,M);
 }
-// остановка потока
-void CountThread::stopEstimation()
-{
-    emit stopEstimationSignal();
-}

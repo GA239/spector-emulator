@@ -12,15 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->createAndConfigureElemtsOfWindow();
     this->setwidgetAssembly();
     this->setWindowTitle("spector-emulator");
-    //this->setStyleSheet( " background-color: white; " );
-
-    QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/export.png"), "Export Config");
-    connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfigSlot()));
-    QAction *importConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/import.png"), "Import Config");
-    connect(importConfig, SIGNAL(triggered()), this, SLOT(importConfigSlot()));
-    QAction *saveData = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/save.png"), "Save Data");
-    connect(saveData, SIGNAL(triggered()), this, SLOT(saveDataSlot()));
-
+    this->setMinimumSize(qApp->desktop()->height()/4*3/3*4, qApp->desktop()->height()/4*3);
 }
 
 MainWindow::~MainWindow()
@@ -36,24 +28,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::createThreadEstimation(void)
 {
+    QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/export.png"), "Export Config");
+    connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfigSlot()));
+    QAction *importConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/import.png"), "Import Config");
+    connect(importConfig, SIGNAL(triggered()), this, SLOT(importConfigSlot()));
+    QAction *saveData = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/save.png"), "Save Data");
+    connect(saveData, SIGNAL(triggered()), this, SLOT(saveDataSlot()));
+
     // Connect progress notifications to progress bar
     QObject::connect(generator, SIGNAL(progressChanged(int)), this, SLOT(progressSet(int)));
     // Connect the transfer of results
     qRegisterMetaType<QVector<double> >("QVector<double>");
     QObject::connect(generator, SIGNAL(SendResults(QVector<double>)), this, SLOT(GetResults(QVector<double>)));
 
-    //  огда выполнение работы закончитс€ - поток должен завершитьс€
+    // When the work is done, the thread should end
     QObject::connect(generator, SIGNAL(done()), worker, SLOT(quit()));
     QObject::connect(generator, SIGNAL(done()), this, SLOT(updateProgressbar()));
 
-    // соедин€ем начало расчЄтов с запуском потока
+    // connect the beginning of calculations with the start of the flow
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QModelIndexList >("QModelIndexList");
     QObject::connect(this, SIGNAL(estimateGasSpector(QVector<int>,QModelIndexList)),worker, SLOT(estimateGasSpector(QVector<int>,QModelIndexList)));
     QObject::connect(worker, SIGNAL(estimateGasSpectorStarted(QVector<int>,QModelIndexList)), generator, SLOT(estimateGasSpector(QVector<int>,QModelIndexList)));
-    //прерывание
-    QObject::connect(worker, SIGNAL(stopEstimationSignal()), generator, SLOT(stopEstimation()));
-    //QObject::connect(worker, SIGNAL(stopEstimationSignal()), generator, SLOT(stopEstimation()));
 
     // transfer the calculations to the thread
     generator->moveToThread(worker);
@@ -64,6 +60,7 @@ int MainWindow::exportData(QString & resultStr)
     resultStr = QFileDialog::getSaveFileName(this, tr("Save gas spector"),"gsData",tr("Text (*.txt)"));
     if(resultStr.isEmpty())
         return -1;
+
     QFile fileOut(resultStr);
     if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -75,7 +72,10 @@ int MainWindow::exportData(QString & resultStr)
     }
     else
     {
-        //error message
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Can not open the file!");
+        messageBox.setFixedSize(500,200);
+        return -1;
     }
     return _RC_SUCCES_;
 }
@@ -85,30 +85,34 @@ int MainWindow::exportConfigSlot()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save gas spector"),"gas-spector.gscfg",tr("Text (*.gscfg)"));
     if(fileName.isEmpty())
         return -1;
+
     QSettings settings( fileName, QSettings::IniFormat );
+
     settings.beginGroup( "Controller" );
 
-    QVector<int> controllerValues = this->controll->getUvalues();
-    for(int i = 0; i < controllerValues.length(); ++i)
-        settings.setValue( "U" + QString::number(i) , controllerValues[i]);
+        QVector<int> controllerValues = this->controll->getUvalues();
+        for(int i = 0; i < controllerValues.length(); ++i)
+            settings.setValue( "U" + QString::number(i) , controllerValues[i]);
 
     settings.endGroup();
 
     settings.beginGroup( "Gases" );
-    QStringList gases = this->controll->getTagsFromSearchWidgetAsStringList();
-    if(gases.isEmpty())
-        return _RC_SUCCES_;
 
-    settings.setValue( "gasesNumber" , gases.length());
-    for(int i = 0; i < gases.length(); ++i)
-        settings.setValue( "G" + QString::number(i) , gases[i]);
+        QStringList gases = this->controll->getTagsFromSearchWidgetAsStringList();
+        if(gases.isEmpty())
+            return _RC_SUCCES_;
+
+        settings.setValue( "gasesNumber" , gases.length());
+        for(int i = 0; i < gases.length(); ++i)
+            settings.setValue( "G" + QString::number(i) , gases[i]);
+
     settings.endGroup();
 
     QString dataSrc;
     if(exportData(dataSrc))
     {
         settings.beginGroup( "Data" );
-        settings.setValue( "Path" , dataSrc);
+            settings.setValue( "Path" , dataSrc);
         settings.endGroup();
     }
     return _RC_SUCCES_;
@@ -137,7 +141,12 @@ int MainWindow::importConfigSlot()
     {
         controllerValues[i] = settings.value( "U" + QString::number(i), -1 ).toInt();
         if(controllerValues[i] < 250)
+        {
+            QMessageBox messageBox;
+            messageBox.critical(0,"Error","Incorrect input!");
+            messageBox.setFixedSize(500,200);
             return -1;
+        }
     }
     this->controll->setUvalues(controllerValues);
     settings.endGroup();
@@ -148,8 +157,12 @@ int MainWindow::importConfigSlot()
         return _RC_SUCCES_;
 
     if(gsize < 0)
+    {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Incorrect input!");
+        messageBox.setFixedSize(500,200);
         return -1;
-
+    }
     QStringList gases;
     for(int i = 0; i < gsize; ++i)
         gases.append(settings.value( "G" + QString::number(i), "" ).toString());
@@ -166,7 +179,12 @@ int MainWindow::importConfigSlot()
 
     QFile file(dataPath);
     if (!file.open(QIODevice::ReadOnly))
-       return -1;
+    {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Can not open the file!");
+        messageBox.setFixedSize(500,200);
+        return -1;
+    }
 
     QTextStream fileStream(&file);
     QVector<double> values;
@@ -182,7 +200,7 @@ void MainWindow::createAndConfigureElemtsOfWindow()
 {
     ///* data generator *///
     //class for parallel (heavy) estimations
-    DataGenerator::bobo = false;
+    DataGenerator::stopEstimate = false;
     this->generator =  new DataGenerator() ;
 
     //The flow in which the estimation will be performed
@@ -196,7 +214,6 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     QStringListModel *model = new QStringListModel(this);
     model->setStringList(this->generator->getModelElemnts());
     this->controll->setModelToSearchWidget(model);
-    //QObject::connect(this->controll, SIGNAL(Changed()), this, SLOT(ControllChanged()));
 
     ///* plot widget *///
     this->plotter =  new PlotSEWidget();
@@ -224,7 +241,6 @@ void MainWindow::setwidgetAssembly()
     layout->addWidget(this->plotter,0,1,2,3);
     layout->addWidget(this->startEstimateBottom,2,0);
     layout->addWidget(this->progressBar,2,1,1,3);
-
     this->ui->centralWidget->setLayout(layout);
 }
 
@@ -240,30 +256,26 @@ void MainWindow::GetResults(QVector<double> results)
     this->update();
 }
 
-void MainWindow::bobotreu()
+void MainWindow::stopEstimate()
 {
-    DataGenerator::bobo = true;
+    DataGenerator::stopEstimate = true;
 }
 
 void MainWindow::updateProgressbar()
 {
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
     this->startEstimateBottom->setText("Estimate");
-    QObject::disconnect(this->startEstimateBottom, SIGNAL(clicked()), worker, SLOT(stopEstimation()));
     this->progressBar->hide();
-
 }
 
 
 void MainWindow::EstimateBottomPressed()
 {
-    // ќбеспечиваем прерывание потока по нажатию кнопки Stop
+    // We provide interruption of the flow by pressing the Stop button
     QObject::disconnect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
     this->startEstimateBottom->setText("Stop");
-    //QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), worker, SLOT(stopEstimation()));
-    QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(bobotreu()));
+    QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(stopEstimate()));
 
-    //QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), generator, SLOT(stopEstimation()));
     this->progressBar->show();
     emit estimateGasSpector(this->controll->getUvalues(),this->controll->getTagsFromSearchWidget());
 }

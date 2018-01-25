@@ -10,7 +10,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = PlotSEWidget
 TEMPLATE = lib
 
-
 SOURCES += \ 
     plotsewidget.cpp \
     qcustomplot.cpp
@@ -18,5 +17,3 @@ SOURCES += \
 HEADERS  += \ 
     plotsewidget.h \
     qcustomplot.h
-
-DISTFILES +=

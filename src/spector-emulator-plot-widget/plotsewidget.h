@@ -9,21 +9,18 @@ class PlotSEWidget : public QWidget
     Q_OBJECT
 
 public:
-    PlotSEWidget(QWidget *parent = 0);
+    explicit PlotSEWidget(QWidget *parent = 0);
     ~PlotSEWidget();
 
+    ///
+    /// \brief setPlotData sets values for rendering
+    /// \param values - ordinates of the gas spectrum
+    ///
     void setPlotData(QVector<double> values);
-    QSharedPointer<QCPGraphDataContainer> getData() const { return customPlot->graph(0)->data(); }
-
-signals:
-
-public slots:
-
-protected:
-    void keyPressEvent(QKeyEvent *event);
-    void wheelEvent(QWheelEvent *event);
-
-private slots:
+    ///
+    /// \brief getData returns the ordinates of the gas spectrum
+    ///
+    QSharedPointer<QCPGraphDataContainer> getData() const;
 
 private:
 
