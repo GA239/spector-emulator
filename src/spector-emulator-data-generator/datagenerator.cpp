@@ -16,14 +16,23 @@ DataGenerator::DataGenerator(QObject *parent):
     QVector<QPair<int,double> > mc;
     this->stopEstimate = false;
 
-    gasesNames.append("Item1");
+    gasesNames.append("N2");
     mc.append(QPair<int,double>(28, 1.0));
 
-    gasesNames.append("Item2");
+    gasesNames.append("O2");
     mc.append(QPair<int,double>(32, 0.3));
 
-    gasesNames.append("Item3");
+    gasesNames.append("N");
     mc.append(QPair<int,double>(14, 0.2));
+
+    gasesNames.append("O");
+    mc.append(QPair<int,double>(16, 0.07));
+
+    gasesNames.append("Ar");
+    mc.append(QPair<int,double>(40, 0.05));
+
+    gasesNames.append("CO2");
+    mc.append(QPair<int,double>(44, 0.01));
 
     model = new QStringListModel(this);
     model->setStringList(gasesNames);
