@@ -37,3 +37,4 @@ CONFIG(release, debug|release) {
     LIBS+= -L../../../../spector-emulator/libs/libqt-searchwidget/release -lsearchwidget
 
 }
+RC_FILE     = resources.rc

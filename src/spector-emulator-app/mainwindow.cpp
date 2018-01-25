@@ -28,11 +28,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::createThreadEstimation(void)
 {
-    QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/export.png"), "Export Config");
+    QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon("resourses/export.png"), "Export Config");
     connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfigSlot()));
-    QAction *importConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/import.png"), "Import Config");
+    QAction *importConfig = this->ui->mainToolBar->addAction(QIcon("resourses/import.png"), "Import Config");
     connect(importConfig, SIGNAL(triggered()), this, SLOT(importConfigSlot()));
-    QAction *saveData = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/save.png"), "Save Data");
+    QAction *saveData = this->ui->mainToolBar->addAction(QIcon("resourses/save.png"), "Save Data");
     connect(saveData, SIGNAL(triggered()), this, SLOT(saveDataSlot()));
 
     // Connect progress notifications to progress bar
@@ -140,7 +140,7 @@ int MainWindow::importConfigSlot()
     for(int i = 0; i < controllerValues.length(); ++i)
     {
         controllerValues[i] = settings.value( "U" + QString::number(i), -1 ).toInt();
-        if(controllerValues[i] < 250)
+        if(controllerValues[i] < 0)
         {
             QMessageBox messageBox;
             messageBox.critical(0,"Error","Incorrect input!");
