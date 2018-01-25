@@ -14,12 +14,13 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowTitle("spector-emulator");
     //this->setStyleSheet( " background-color: white; " );
 
-    QAction *exportData = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/save.png"), "Save Config");
-    connect(exportData, SIGNAL(triggered()), this, SLOT(exportDataSlot()));
-    QAction *saveConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/export.png"), "Export data");
-    connect(saveConfig, SIGNAL(triggered()), this, SLOT(saveConfig()));
-    QAction *loadData = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/load.png"), "Import data");
-    connect(loadData, SIGNAL(triggered()), this, SLOT(loadDataSlot()));
+    QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/export.png"), "Export Config");
+    connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfigSlot()));
+    QAction *importConfig = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/import.png"), "Import Config");
+    connect(importConfig, SIGNAL(triggered()), this, SLOT(importConfigSlot()));
+    QAction *saveData = this->ui->mainToolBar->addAction(QIcon("../../../../spector-emulator/resourses/save.png"), "Save Data");
+    connect(saveData, SIGNAL(triggered()), this, SLOT(saveDataSlot()));
+
 }
 
 MainWindow::~MainWindow()
@@ -79,7 +80,7 @@ int MainWindow::exportData(QString & resultStr)
     return _RC_SUCCES_;
 }
 
-int MainWindow::saveConfig()
+int MainWindow::exportConfigSlot()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save gas spector"),"gas-spector.gscfg",tr("Text (*.gscfg)"));
     if(fileName.isEmpty())
@@ -92,38 +93,78 @@ int MainWindow::saveConfig()
         settings.setValue( "U" + QString::number(i) , controllerValues[i]);
 
     settings.endGroup();
-    QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, tr("question"), tr("Save Gas-Spector data?"),
-                                QMessageBox::Yes|QMessageBox::No);
-    if (reply == QMessageBox::Yes)
+
+    settings.beginGroup( "Gases" );
+    QStringList gases = this->controll->getTagsFromSearchWidgetAsStringList();
+    if(gases.isEmpty())
+        return _RC_SUCCES_;
+
+    settings.setValue( "gasesNumber" , gases.length());
+    for(int i = 0; i < gases.length(); ++i)
+        settings.setValue( "G" + QString::number(i) , gases[i]);
+    settings.endGroup();
+
+    QString dataSrc;
+    if(exportData(dataSrc))
     {
-        QString dataSrc;
-        if(exportData(dataSrc))
-        {
-            settings.beginGroup( "Data" );
-            settings.setValue( "Path" , dataSrc);
-            settings.endGroup();
-        }
+        settings.beginGroup( "Data" );
+        settings.setValue( "Path" , dataSrc);
+        settings.endGroup();
     }
     return _RC_SUCCES_;
 }
 
-int MainWindow::exportDataSlot()
+int MainWindow::saveDataSlot()
 {
     QString str;
     return exportData(str);
 }
 
-int MainWindow::loadDataSlot()
+int MainWindow::importConfigSlot()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
                                 QString::fromUtf8("Select file"),
                                 QDir::currentPath(),
-                                "Text (*.txt);;All files (*.*)");
+                                "Text (*.gscfg)");
     if(fileName.isEmpty())
         return -1;
 
-    QFile file(fileName);
+    QSettings settings(fileName, QSettings::IniFormat );
+    settings.beginGroup( "Controller" );
+
+    QVector<int> controllerValues = this->controll->getUvalues();
+    for(int i = 0; i < controllerValues.length(); ++i)
+    {
+        controllerValues[i] = settings.value( "U" + QString::number(i), -1 ).toInt();
+        if(controllerValues[i] < 250)
+            return -1;
+    }
+    this->controll->setUvalues(controllerValues);
+    settings.endGroup();
+
+    settings.beginGroup( "Gases" );
+    int gsize = settings.value( "gasesNumber", -1 ).toInt();
+    if(gsize == 0)
+        return _RC_SUCCES_;
+
+    if(gsize < 0)
+        return -1;
+
+    QStringList gases;
+    for(int i = 0; i < gsize; ++i)
+        gases.append(settings.value( "G" + QString::number(i), "" ).toString());
+
+    this->controll->addTags(gases);
+    settings.endGroup();
+
+    settings.beginGroup( "Data" );
+    QString dataPath = settings.value( "Path", "" ).toString();
+    settings.endGroup();
+
+    if(dataPath.isEmpty())
+        return -1;
+
+    QFile file(dataPath);
     if (!file.open(QIODevice::ReadOnly))
        return -1;
 
@@ -153,7 +194,6 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     ///* controll widget *///
     this->controll =  new ControllSEWidget();
     QStringListModel *model = new QStringListModel(this);
-    //model->setStringList(QStringList() << "Item1" << "Item2" << "Item3" << "C" << "C++" << "C#" << "C++" << "php" << "qt");
     model->setStringList(this->generator->getModelElemnts());
     this->controll->setModelToSearchWidget(model);
     //QObject::connect(this->controll, SIGNAL(Changed()), this, SLOT(ControllChanged()));

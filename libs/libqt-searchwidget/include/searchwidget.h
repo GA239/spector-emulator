@@ -15,12 +15,14 @@ public:
     void setSelectionModel(QItemSelectionModel *selModel);
     QStringList unfindedTags();
     QModelIndexList tags();
-
     QItemSelectionModel* selectionModel() const;
     void setEnableNewTagCreation(bool status);
     TagButton *getTagByIndex(const QModelIndex index);
 
     void addTags(QModelIndexList indexList);
+    void addTags(QStringList list);
+    QModelIndexList modelElements();
+    void clearWidget();
 
 
 public slots:

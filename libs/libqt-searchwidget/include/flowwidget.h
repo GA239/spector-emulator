@@ -34,6 +34,7 @@ public:
     void addTagButton(TagButton *tag);
     void deleteTagButton(TagButton *tag);
     TagButton *getTagByIndex(const QModelIndex index);
+    QModelIndexList modelElements();
 
     //! [2]
     void setModel(QAbstractItemModel *model);

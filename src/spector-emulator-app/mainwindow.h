@@ -33,9 +33,9 @@ private slots:
     void GetResults(QVector<double> results);
     void bobotreu();
     void updateProgressbar();
-    int saveConfig();
-    int exportDataSlot();
-    int loadDataSlot();
+    int exportConfigSlot();
+    int importConfigSlot();
+    int saveDataSlot();
 private:
 
     void createAndConfigureElemtsOfWindow(void);

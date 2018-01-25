@@ -16,7 +16,11 @@ public:
     int getU(int index);
     void setModelToSearchWidget(QAbstractItemModel *model);
     QModelIndexList getTagsFromSearchWidget();
+    QStringList getTagsFromSearchWidgetAsStringList();
     QVector<int> getUvalues();
+    void setUvalues(QVector<int> values);
+    void addTags(QModelIndexList indexList);
+    void addTags(QStringList gaseList);
 
 signals:
     void Changed();

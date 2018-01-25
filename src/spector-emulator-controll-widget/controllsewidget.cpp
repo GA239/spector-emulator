@@ -34,6 +34,7 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
     this->searchWidget = new SearchWidget();
     this->searchWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     layout->addWidget(this->searchWidget,U_NUMBER,0,1,2);
+    //this->searchWidget->set
 }
 
 /**
@@ -79,12 +80,57 @@ QModelIndexList ControllSEWidget::getTagsFromSearchWidget()
     return this->searchWidget->tags();
 }
 
+QStringList ControllSEWidget::getTagsFromSearchWidgetAsStringList()
+{
+    QStringList result;
+    QModelIndexList tmp = this->searchWidget->tags();
+    for(int i = 0; i < tmp.length(); ++i)
+    {
+        result.append(tmp[i].data().toString());
+    }
+    return result;
+}
+
 QVector<int> ControllSEWidget::getUvalues()
 {
     QVector<int> result;
     for(int i = 0; i < U_NUMBER; ++i)
         result.push_back(this->U[i]->value());
     return result;
+}
+
+void ControllSEWidget::setUvalues(QVector<int> values)
+{
+    if(values.size() == U_NUMBER)
+    {
+        for(int i = 0; i < U_NUMBER; ++i)
+            this->U[i]->setValue(values[i]);
+    }
+}
+
+void ControllSEWidget::addTags(QModelIndexList indexList)
+{
+    this->searchWidget->addTags(indexList);
+}
+
+void ControllSEWidget::addTags(QStringList gaseList)
+{
+    this->searchWidget->clearWidget();
+    QModelIndexList tmpList = this->searchWidget->modelElements();
+    QModelIndexList resultList;
+
+    for(int i = 0; i < gaseList.length(); ++i)
+    {
+        for(int j = 0; j < tmpList.length(); ++j)
+        {
+            if(gaseList[i] == tmpList[j].data().toString())
+            {
+                resultList.append(tmpList[j]);
+                break;
+            }
+        }
+    }
+    this->searchWidget->addTags(resultList);
 }
 
 /**
