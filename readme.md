@@ -19,8 +19,5 @@ To ensure cross-platform,the Qt framework was used. All additional libraries of 
 
 If you have any difficulties or questions about using the application, please report it to the development department (ag239@yandex.ru).
 
-## Documentation
-
-User documentation can be obtained from the relevant section ./docs/
 [download]: https://github.com/GA239/spector-emulator/releases
 
