@@ -22,5 +22,6 @@ If you have any difficulties or questions about using the application, please re
 ## Documentation
 
 User documentation can be obtained from the relevant section ./docs/
+
 [download]: https://github.com/GA239/spector-emulator/releases
 
