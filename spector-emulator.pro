@@ -4,4 +4,5 @@ SUBDIRS += \
     src/spector-emulator-controll-widget \
     src/spector-emulator-plot-widget \
     src/spector-emulator-data-generator \
+	src/spector-emulator-peak-detector \
     src/spector-emulator-app 

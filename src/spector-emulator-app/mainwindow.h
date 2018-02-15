@@ -5,9 +5,8 @@
 #include "../spector-emulator-controll-widget/controllsewidget.h"
 #include "../spector-emulator-plot-widget/plotsewidget.h"
 #include "../spector-emulator-data-generator/datagenerator.h"
+#include "../spector-emulator-peak-detector/peakdetector.h"
 #include "countthread.h"
-
-#define _RC_SUCCES_ 1
 
 namespace Ui {
 class MainWindow;
@@ -67,6 +66,7 @@ private slots:
     /// \return
     ///
     int saveDataSlot();
+    int estimatePikiSlot();
 private:
 
     void createAndConfigureElemtsOfWindow(void);
@@ -78,6 +78,8 @@ private:
     ControllSEWidget* controll;
     PlotSEWidget* plotter;
     QPushButton* startEstimateBottom;
+    QPushButton* pikiEstimateBottom;
+
     QProgressBar* progressBar;
 
     //class for parallel (heavy) estimations

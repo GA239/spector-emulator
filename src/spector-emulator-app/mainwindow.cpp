@@ -75,7 +75,7 @@ int MainWindow::exportData(QString & resultStr)
         messageBox.setFixedSize(500,200);
         return -1;
     }
-    return _RC_SUCCES_;
+    return _RC_SUCCESS_;
 }
 
 int MainWindow::exportConfigSlot()
@@ -98,7 +98,7 @@ int MainWindow::exportConfigSlot()
 
         QStringList gases = this->controll->getTagsFromSearchWidgetAsStringList();
         if(gases.isEmpty())
-            return _RC_SUCCES_;
+            return _RC_SUCCESS_;
 
         settings.setValue( "gasesNumber" , gases.length());
         for(int i = 0; i < gases.length(); ++i)
@@ -112,13 +112,29 @@ int MainWindow::exportConfigSlot()
             settings.setValue( "Path" , dataSrc);
         settings.endGroup();
     }
-    return _RC_SUCCES_;
+    return _RC_SUCCESS_;
 }
 
 int MainWindow::saveDataSlot()
 {
     QString str;
     return exportData(str);
+}
+
+int MainWindow::estimatePikiSlot()
+{
+    QVector<double> input,output;
+    QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData();
+    for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter)
+        input.push_back(iter->value);
+
+    PeakDetector pd;
+    int rc = pd.estimate(input,output);
+
+    if(rc != _RC_SUCCESS_)
+        return rc;
+    this->GetResults(output);
+    return _RC_SUCCESS_;
 }
 
 int MainWindow::importConfigSlot()
@@ -149,7 +165,7 @@ int MainWindow::importConfigSlot()
     settings.beginGroup( "Gases" );
     int gsize = settings.value( "gasesNumber", -1 ).toInt();
     if(gsize == 0)
-        return _RC_SUCCES_;
+        return _RC_SUCCESS_;
 
     if(gsize < 0){
         QMessageBox messageBox;
@@ -186,7 +202,7 @@ int MainWindow::importConfigSlot()
     }
     file.close();
     this->GetResults(values);
-    return _RC_SUCCES_;
+    return _RC_SUCCESS_;
 }
 
 void MainWindow::createAndConfigureElemtsOfWindow()
@@ -225,6 +241,12 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     this->startEstimateBottom->setText("Estimate");
     this->startEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
+
+    this->pikiEstimateBottom = new QPushButton();
+    this->pikiEstimateBottom->setFont(font );
+    this->pikiEstimateBottom->setText("Piki");
+    this->pikiEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+    QObject::connect(this->pikiEstimateBottom, SIGNAL(clicked()), this, SLOT(estimatePikiSlot()));
 }
 
 void MainWindow::setwidgetAssembly()
@@ -233,7 +255,8 @@ void MainWindow::setwidgetAssembly()
     layout->addWidget(this->controll,0,0);
     layout->addWidget(this->plotter,0,1,2,3);
     layout->addWidget(this->startEstimateBottom,2,0);
-    layout->addWidget(this->progressBar,2,1,1,3);
+    layout->addWidget(this->pikiEstimateBottom,2,1);
+    layout->addWidget(this->progressBar,2,2,1,2);
     this->ui->centralWidget->setLayout(layout);
 }
 

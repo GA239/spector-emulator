@@ -26,6 +26,7 @@ CONFIG(debug, debug|release) {
     LIBS+= -L../spector-emulator-controll-widget/debug -lControllSEWidget
     LIBS+= -L../spector-emulator-plot-widget/debug -lPlotSEWidget
     LIBS+= -L../spector-emulator-data-generator/debug -lDataGeneratorLib
+    LIBS+= -L../spector-emulator-peak-detector/debug -lPeakDetectorLib
     LIBS+= -L../../../spector-emulator/libs/libqt-searchwidget/debug -lsearchwidget
 
 }
@@ -34,6 +35,7 @@ CONFIG(release, debug|release) {
     LIBS+= -L../spector-emulator-controll-widget/release -lControllSEWidget
     LIBS+= -L../spector-emulator-plot-widget/release -lPlotSEWidget
     LIBS+= -L../spector-emulator-data-generator/release -lDataGeneratorLib
+    LIBS+= -L../spector-emulator-peak-detector/release -lPeakDetectorLib
     LIBS+= -L../../../../spector-emulator/libs/libqt-searchwidget/release -lsearchwidget
 
 }
