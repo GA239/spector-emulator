@@ -13,8 +13,7 @@
 ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 {
     QGridLayout *layout = new QGridLayout(this);
-    for(int i = 0; i < U_NUMBER; ++i)
-    {
+    for(int i = 0; i < U_NUMBER; ++i){
         // add scroll bar for each gas
         QScrollBar* sb = new QScrollBar(Qt::Horizontal,parent);
         this->U.push_back(sb);
@@ -44,8 +43,7 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 ControllSEWidget::~ControllSEWidget()
 {
     delete this->searchWidget;
-    for(int i = 0; i < U_NUMBER; ++i)
-    {
+    for(int i = 0; i < U_NUMBER; ++i){
         delete this->U[i];
         delete this->ULable[i];
     }
@@ -100,8 +98,7 @@ QVector<int> ControllSEWidget::getUvalues()
 
 void ControllSEWidget::setUvalues(QVector<int> values)
 {
-    if(values.size() == U_NUMBER)
-    {
+    if(values.size() == U_NUMBER){
         for(int i = 0; i < U_NUMBER; ++i)
             this->U[i]->setValue(values[i]);
     }
@@ -118,12 +115,9 @@ void ControllSEWidget::addTags(QStringList gaseList)
     QModelIndexList tmpList = this->searchWidget->modelElements();
     QModelIndexList resultList;
 
-    for(int i = 0; i < gaseList.length(); ++i)
-    {
-        for(int j = 0; j < tmpList.length(); ++j)
-        {
-            if(gaseList[i] == tmpList[j].data().toString())
-            {
+    for(int i = 0; i < gaseList.length(); ++i){
+        for(int j = 0; j < tmpList.length(); ++j){
+            if(gaseList[i] == tmpList[j].data().toString()){
                 resultList.append(tmpList[j]);
                 break;
             }

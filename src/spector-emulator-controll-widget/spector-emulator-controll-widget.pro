@@ -19,11 +19,11 @@ HEADERS  += \
 
 CONFIG(debug, debug|release) {
 
-    LIBS+= -L../../../../spector-emulator/libs/libqt-searchwidget/debug -lsearchwidget
+    LIBS+= -L../../../spector-emulator/libs/libqt-searchwidget/debug -lsearchwidget
 }
 
 CONFIG(release, debug|release) {
 
-    LIBS+= -L../../../../spector-emulator/libs/libqt-searchwidget/release -lsearchwidget
+    LIBS+= -L../../../spector-emulator/libs/libqt-searchwidget/release -lsearchwidget
 
 }

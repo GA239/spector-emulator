@@ -1,0 +1,2 @@
+build path for each project should be
+../build-%{CurrentProject:Name}

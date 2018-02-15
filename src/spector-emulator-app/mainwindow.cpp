@@ -62,16 +62,14 @@ int MainWindow::exportData(QString & resultStr)
         return -1;
 
     QFile fileOut(resultStr);
-    if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
+    if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text)){
         QTextStream writeStream(&fileOut);
         QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData();
         for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter)
             writeStream << QString::number(iter->value) << "\n";
         fileOut.close();
     }
-    else
-    {
+    else{
         QMessageBox messageBox;
         messageBox.critical(0,"Error","Can not open the file!");
         messageBox.setFixedSize(500,200);
@@ -109,8 +107,7 @@ int MainWindow::exportConfigSlot()
     settings.endGroup();
 
     QString dataSrc;
-    if(exportData(dataSrc))
-    {
+    if(exportData(dataSrc)){
         settings.beginGroup( "Data" );
             settings.setValue( "Path" , dataSrc);
         settings.endGroup();
@@ -137,11 +134,9 @@ int MainWindow::importConfigSlot()
     settings.beginGroup( "Controller" );
 
     QVector<int> controllerValues = this->controll->getUvalues();
-    for(int i = 0; i < controllerValues.length(); ++i)
-    {
+    for(int i = 0; i < controllerValues.length(); ++i){
         controllerValues[i] = settings.value( "U" + QString::number(i), -1 ).toInt();
-        if(controllerValues[i] < 0)
-        {
+        if(controllerValues[i] < 0){
             QMessageBox messageBox;
             messageBox.critical(0,"Error","Incorrect input!");
             messageBox.setFixedSize(500,200);
@@ -156,8 +151,7 @@ int MainWindow::importConfigSlot()
     if(gsize == 0)
         return _RC_SUCCES_;
 
-    if(gsize < 0)
-    {
+    if(gsize < 0){
         QMessageBox messageBox;
         messageBox.critical(0,"Error","Incorrect input!");
         messageBox.setFixedSize(500,200);
@@ -178,8 +172,7 @@ int MainWindow::importConfigSlot()
         return -1;
 
     QFile file(dataPath);
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)){
         QMessageBox messageBox;
         messageBox.critical(0,"Error","Can not open the file!");
         messageBox.setFixedSize(500,200);
@@ -188,7 +181,7 @@ int MainWindow::importConfigSlot()
 
     QTextStream fileStream(&file);
     QVector<double> values;
-    while(!fileStream.atEnd()) {
+    while(!fileStream.atEnd()){
         values.push_back(fileStream.readLine().toDouble());
     }
     file.close();

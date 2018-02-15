@@ -26,7 +26,7 @@ CONFIG(debug, debug|release) {
     LIBS+= -L../spector-emulator-controll-widget/debug -lControllSEWidget
     LIBS+= -L../spector-emulator-plot-widget/debug -lPlotSEWidget
     LIBS+= -L../spector-emulator-data-generator/debug -lDataGeneratorLib
-    LIBS+= -L../../../../spector-emulator/libs/libqt-searchwidget/debug -lsearchwidget
+    LIBS+= -L../../../spector-emulator/libs/libqt-searchwidget/debug -lsearchwidget
 
 }
 

@@ -53,12 +53,9 @@ QVector<double> DataGenerator::getData(const int u1, const int u2, const int uk,
 {
     QList<QModelIndex> tmpIndexList;
     QVector<double> empty;
-    for(int i = 0; i < M.length(); ++i)
-    {
-        for(int j = 0; j < gases.keys().length(); ++j)
-        {
-            if(gases.keys()[j].data() == M[i].data())
-            {
+    for(int i = 0; i < M.length(); ++i){
+        for(int j = 0; j < gases.keys().length(); ++j){
+            if(gases.keys()[j].data() == M[i].data()){
                 tmpIndexList.append(gases.keys()[j]);
                 break;
             }
@@ -69,8 +66,7 @@ QVector<double> DataGenerator::getData(const int u1, const int u2, const int uk,
 
     QVector<QVector<double> > tmp = estemateData(u1,u2,uk,createMassesOfGases(tmpIndexList));
     QVector<double> result(tmp[0].length(),0);
-    for(int i = 0; i < M.length(); ++i)
-    {
+    for(int i = 0; i < M.length(); ++i){
         for(int j = 0; j < result.length(); ++j)
             result[j]+= tmp[i][j] * gases.value(tmpIndexList[i]).second;
     }
@@ -128,20 +124,18 @@ QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2
         x[i] = distribution(generator);
 
     QVector<double> tmp;
-    for(int j=0; j<nrolls; ++j)
-    {
+    for(int j=0; j<nrolls; ++j){
         //estimate the flight time for each ion
         p.x = x[j];
         tmp = tof(p);
-        for  (int i=0; i<tmp.length(); ++i)
-        {
+        for  (int i=0; i<tmp.length(); ++i){
             if (tmp[i] != 0)
                 y[i].push_back(tmp[i]);
         }
     }
     // set grid
     QVector<double> ydiaposon(5000 + 2, 0);
-    for  (int i=0; i<ydiaposon.length(); ++i) {
+    for  (int i=0; i<ydiaposon.length(); ++i){
         ydiaposon[i] = i*2;
     }
 
@@ -151,27 +145,21 @@ QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2
     int progress = 0;
     emit progressChanged(progress);
 
-    for  (int j=0; j<result.length(); ++j)
-    {
+    for(int j=0; j<result.length(); ++j){
         result[j].resize(ydiaposon.length()-1);
 
         //create a histogram of flight time
-        for  (int i=0; i<result[j].length(); ++i)
-        {
+        for  (int i=0; i<result[j].length(); ++i){
             result[j][i] = 0;
-            for(int k=0; k < y[j].length(); ++k)
-            {
-                if( (y[j][k] > ydiaposon[i]) && (y[j][k] <= ydiaposon[i+1]))
-                {
+            for(int k=0; k < y[j].length(); ++k){
+                if( (y[j][k] > ydiaposon[i]) && (y[j][k] <= ydiaposon[i+1])){
                    result[j][i] = result[j][i] + 1;
                 }
             }
             progress = (( i + j*result[j].length() ) * 100)/(result.length() * result[j].length());
             emit progressChanged(progress);
             if (stopEstimate)
-            {
-              break;
-            }
+                break;
         }
     }
     emit progressChanged(100);
@@ -205,7 +193,6 @@ QVector<double> DataGenerator::tof(const Params &param)
     double Tmirr1,Tmirr2,Vmrr;
 
     for(int i = 0; i < param.M.length(); ++i){
-
         Vis = k * sqrt(Uion / param.M[i]);
         // tof ion guide  v0 = 0
         Ti = 2 * param.x / Vis;
