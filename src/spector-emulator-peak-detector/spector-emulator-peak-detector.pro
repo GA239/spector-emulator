@@ -11,6 +11,7 @@ SOURCES += \
     peakdetector.cpp
 
 HEADERS  += \ 
-    peakdetector.h
+    peakdetector.h \
+    algoritm.h
 
 DISTFILES +=
