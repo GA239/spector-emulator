@@ -134,7 +134,7 @@ int MainWindow::estimatePikiSlot()
     if(rc != _RC_SUCCESS_)
         return rc;
 
-    rc =pd.getEstimateByName(PeakDetector::estimatesTracksNames[PeakDetector::ESTIMATES_NAMES::SIGNALS], output);
+    rc =pd.getEstimateByName(PeakDetector::estimatesTracksNames[PeakDetector::ESTIMATES_NAMES::PEAK], output);
     if(rc != _RC_SUCCESS_)
         return rc;
 
