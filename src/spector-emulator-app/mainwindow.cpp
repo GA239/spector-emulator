@@ -82,6 +82,14 @@ int MainWindow::exportData(QString & resultStr)
 
 int MainWindow::exportConfigSlot()
 {
+    if(this->controllChangedFlag)
+    {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","The controller values ​​and plot data are dismatch! \nReestimate data!");
+        messageBox.setFixedSize(500,200);
+        return _ERROR_WRONG_WORKFLOW_;
+    }
+
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save gas spector"),"gas-spector.gscfg",tr("Text (*.gscfg)"));
     if(fileName.isEmpty())
         return -1;
@@ -155,6 +163,11 @@ int MainWindow::estimatePikiSlot()
 
     this->update();
     return _RC_SUCCESS_;
+}
+
+void MainWindow::controllChanged()
+{
+    this->controllChangedFlag = true;
 }
 
 int MainWindow::importConfigSlot()
@@ -243,6 +256,8 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     QStringListModel *model = new QStringListModel(this);
     model->setStringList(this->generator->getModelElemnts());
     this->controll->setModelToSearchWidget(model);
+    this->controllChangedFlag = false;
+    QObject::connect(this->controll, SIGNAL(Changed()), this, SLOT(controllChanged()));
 
     ///* plot widget *///
     this->plotter =  new PlotSEWidget();
@@ -290,6 +305,7 @@ void MainWindow::GetResults(QVector<double> results)
 {
     this->plotter->cleanData();
     this->plotter->setPlotData(results, PlotSEWidget::PLOT_NAMES::SPECTURM);
+    this->controllChangedFlag = false;
     this->update();
 }
 

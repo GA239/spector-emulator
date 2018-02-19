@@ -67,6 +67,7 @@ private slots:
     ///
     int saveDataSlot();
     int estimatePikiSlot();
+    void controllChanged();
 private:
 
     void createAndConfigureElemtsOfWindow(void);
@@ -76,6 +77,7 @@ private:
 
     Ui::MainWindow *ui;
     ControllSEWidget* controll;
+    bool controllChangedFlag;
     PlotSEWidget* plotter;
     QPushButton* startEstimateBottom;
     QPushButton* pikiEstimateBottom;
