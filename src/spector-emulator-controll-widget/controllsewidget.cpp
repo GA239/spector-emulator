@@ -102,11 +102,13 @@ void ControllSEWidget::setUvalues(QVector<int> values)
         for(int i = 0; i < U_NUMBER; ++i)
             this->U[i]->setValue(values[i]);
     }
+    emit Changed();
 }
 
 void ControllSEWidget::addTags(QModelIndexList indexList)
 {
     this->searchWidget->addTags(indexList);
+    emit Changed();
 }
 
 void ControllSEWidget::addTags(QStringList gaseList)
@@ -124,4 +126,5 @@ void ControllSEWidget::addTags(QStringList gaseList)
         }
     }
     this->searchWidget->addTags(resultList);
+    emit Changed();
 }

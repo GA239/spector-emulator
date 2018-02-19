@@ -64,7 +64,9 @@ int MainWindow::exportData(QString & resultStr)
     QFile fileOut(resultStr);
     if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text)){
         QTextStream writeStream(&fileOut);
-        QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData();
+        QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData(PlotSEWidget::PLOT_NAMES::SPECTURM);
+        if(data == nullptr)
+            return _RC_SUCCESS_;
         for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter)
             writeStream << QString::number(iter->value) << "\n";
         fileOut.close();
@@ -80,6 +82,14 @@ int MainWindow::exportData(QString & resultStr)
 
 int MainWindow::exportConfigSlot()
 {
+    if(this->controllChangedFlag)
+    {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","The controller values ​​and plot data are dismatch! \nReestimate data!");
+        messageBox.setFixedSize(500,200);
+        return _ERROR_WRONG_WORKFLOW_;
+    }
+
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save gas spector"),"gas-spector.gscfg",tr("Text (*.gscfg)"));
     if(fileName.isEmpty())
         return -1;
@@ -124,7 +134,14 @@ int MainWindow::saveDataSlot()
 int MainWindow::estimatePikiSlot()
 {
     QVector<double> input,output;
-    QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData();
+    QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData(PlotSEWidget::PLOT_NAMES::SPECTURM);
+    if(data == nullptr){
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Data Is Not Avaliable!");
+        messageBox.setFixedSize(500,200);
+        return _ERROR_WRONG_WORKFLOW_;
+    }
+
     for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter)
         input.push_back(iter->value);
 
@@ -137,9 +154,20 @@ int MainWindow::estimatePikiSlot()
     rc =pd.getEstimateByName(PeakDetector::estimatesTracksNames[PeakDetector::ESTIMATES_NAMES::PEAK], output);
     if(rc != _RC_SUCCESS_)
         return rc;
+    this->plotter->setPlotData(output, PlotSEWidget::PLOT_NAMES::SIGNALS);
 
-    this->GetResults(output);
+    rc =pd.getEstimateByName(PeakDetector::estimatesTracksNames[PeakDetector::ESTIMATES_NAMES::PEAK], output);
+    if(rc != _RC_SUCCESS_)
+        return rc;
+    this->plotter->setPlotData(output, PlotSEWidget::PLOT_NAMES::PEAK);
+
+    this->update();
     return _RC_SUCCESS_;
+}
+
+void MainWindow::controllChanged()
+{
+    this->controllChangedFlag = true;
 }
 
 int MainWindow::importConfigSlot()
@@ -228,6 +256,8 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     QStringListModel *model = new QStringListModel(this);
     model->setStringList(this->generator->getModelElemnts());
     this->controll->setModelToSearchWidget(model);
+    this->controllChangedFlag = false;
+    QObject::connect(this->controll, SIGNAL(Changed()), this, SLOT(controllChanged()));
 
     ///* plot widget *///
     this->plotter =  new PlotSEWidget();
@@ -273,7 +303,9 @@ void MainWindow::progressSet(int value)
 
 void MainWindow::GetResults(QVector<double> results)
 {
-    this->plotter->setPlotData(results);
+    this->plotter->cleanData();
+    this->plotter->setPlotData(results, PlotSEWidget::PLOT_NAMES::SPECTURM);
+    this->controllChangedFlag = false;
     this->update();
 }
 

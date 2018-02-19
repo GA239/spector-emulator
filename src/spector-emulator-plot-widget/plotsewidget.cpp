@@ -6,26 +6,22 @@
  * @brief Default constructor
  * @param parent
  */
-PlotSEWidget::PlotSEWidget(QWidget *parent) : QWidget(parent)
+PlotSEWidget::PlotSEWidget(QWidget *parent, int numberOfPlots) : QWidget(parent)
 {
-    customPlot = new QCustomPlot(this);
-    QGridLayout *layout = new QGridLayout(this);
+    customPlotArray.resize(numberOfPlots);
+    QVBoxLayout *layout = new QVBoxLayout(this);
 
-    QHBoxLayout *horizontLayoutU1 = new QHBoxLayout(parent);
-    horizontLayoutU1->addWidget(customPlot);
+    for(int index = 0; index < customPlotArray.length(); ++index){
+        customPlotArray[index] = new QCustomPlot(this);
+        layout->addWidget(customPlotArray[index]);
+        // create graph and assign data to it:
+        customPlotArray[index]->addGraph();
 
-    layout->addLayout(horizontLayoutU1,0,0);
-
-    // create graph and assign data to it:
-    customPlot->addGraph();
-
-    // give the axes some labels:
-    customPlot->xAxis->setLabel("x");
-    customPlot->yAxis->setLabel("y");
-    // set axes ranges, so we see all data:
-    customPlot->xAxis->setRange(0, 5000);
-    customPlot->yAxis->setRange(0, 50);
-    customPlot->replot();
+        // give the axes some labels:
+        //customPlotArray[index]->xAxis->setLabel("x");
+        //customPlotArray[index]->yAxis->setLabel("y");
+        customPlotArray[index]->hide();
+    }
 }
 
 /**
@@ -35,20 +31,44 @@ PlotSEWidget::~PlotSEWidget()
 {
 }
 
-void PlotSEWidget::setPlotData(QVector<double> values)
+void PlotSEWidget::setPlotData(QVector<double> values, PLOT_NAMES plotName)
 {
+    if(customPlotArray.length() <= plotName)
+        return;
+
     if(values.empty())
         return;
-    //calculate the abscissas of the gas spectrum
     QVector<double> x(values.length());
-    for(int i = 0; i < values.length(); ++i)
+    double maximum = values[0];
+    //calculate the abscissas and maximum of the data
+    for(int i = 0; i < values.length(); ++i){
         x[i] = i;
+        if(values[i] > maximum)
+            maximum = values[i];
+    }
 
-    customPlot->graph(0)->setData(x, values);
-    customPlot->replot();
+    // set axes ranges, so we see all data:
+    customPlotArray[plotName]->xAxis->setRange(0, values.length());
+    customPlotArray[plotName]->yAxis->setRange(0, maximum);
+
+    customPlotArray[plotName]->graph(0)->setData(x, values);
+    customPlotArray[plotName]->replot();
+    customPlotArray[plotName]->show();
 }
 
-QSharedPointer<QCPGraphDataContainer> PlotSEWidget::getData() const
+QSharedPointer<QCPGraphDataContainer> PlotSEWidget::getData(PLOT_NAMES plotName) const
 {
-     return customPlot->graph(0)->data();
+    if(customPlotArray.length() <= plotName)
+        return nullptr;
+    if(customPlotArray[plotName]->isHidden())
+        return nullptr;
+    return customPlotArray[plotName]->graph(0)->data();
+}
+
+void PlotSEWidget::cleanData()
+{
+    for(int index = 0; index < customPlotArray.length(); ++index){
+        customPlotArray[index]->graph(0)->data()->clear();
+        customPlotArray[index]->hide();
+    }
 }
