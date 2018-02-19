@@ -7,7 +7,7 @@
 
 #define _ERROR_NO_ROOM_ -10
 #define _ERROR_WRONG_ARGUMENT_ -9
-
+#define _ERROR_WRONG_WORKFLOW_ -8
 #define _RC_SUCCESS_ 1
 
 

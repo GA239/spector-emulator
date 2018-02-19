@@ -64,7 +64,9 @@ int MainWindow::exportData(QString & resultStr)
     QFile fileOut(resultStr);
     if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text)){
         QTextStream writeStream(&fileOut);
-        QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData();
+        QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData(PlotSEWidget::PLOT_NAMES::SPECTURM);
+        if(data == nullptr)
+            return _RC_SUCCESS_;
         for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter)
             writeStream << QString::number(iter->value) << "\n";
         fileOut.close();
@@ -124,7 +126,14 @@ int MainWindow::saveDataSlot()
 int MainWindow::estimatePikiSlot()
 {
     QVector<double> input,output;
-    QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData();
+    QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData(PlotSEWidget::PLOT_NAMES::SPECTURM);
+    if(data == nullptr){
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Data Is Not Avaliable!");
+        messageBox.setFixedSize(500,200);
+        return _ERROR_WRONG_WORKFLOW_;
+    }
+
     for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter)
         input.push_back(iter->value);
 
@@ -137,8 +146,14 @@ int MainWindow::estimatePikiSlot()
     rc =pd.getEstimateByName(PeakDetector::estimatesTracksNames[PeakDetector::ESTIMATES_NAMES::SIGNALS], output);
     if(rc != _RC_SUCCESS_)
         return rc;
+    this->plotter->setPlotData(output, PlotSEWidget::PLOT_NAMES::SIGNALS);
 
-    this->GetResults(output);
+    rc =pd.getEstimateByName(PeakDetector::estimatesTracksNames[PeakDetector::ESTIMATES_NAMES::PEAK], output);
+    if(rc != _RC_SUCCESS_)
+        return rc;
+    this->plotter->setPlotData(output, PlotSEWidget::PLOT_NAMES::PEAK);
+
+    this->update();
     return _RC_SUCCESS_;
 }
 
@@ -273,7 +288,8 @@ void MainWindow::progressSet(int value)
 
 void MainWindow::GetResults(QVector<double> results)
 {
-    this->plotter->setPlotData(results);
+    this->plotter->cleanData();
+    this->plotter->setPlotData(results, PlotSEWidget::PLOT_NAMES::SPECTURM);
     this->update();
 }
 
