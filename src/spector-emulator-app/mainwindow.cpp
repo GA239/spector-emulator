@@ -34,6 +34,8 @@ void MainWindow::createThreadEstimation(void)
     connect(importConfig, SIGNAL(triggered()), this, SLOT(importConfigSlot()));
     QAction *saveData = this->ui->mainToolBar->addAction(QIcon("resourses/save.png"), "Save Data");
     connect(saveData, SIGNAL(triggered()), this, SLOT(saveDataSlot()));
+    QAction *chartChange = this->ui->mainToolBar->addAction(QIcon("resourses/chart.png"), "Change chart");
+    connect(chartChange, SIGNAL(triggered()), this, SLOT(changeChartLayout()));
 
     // Connect progress notifications to progress bar
     QObject::connect(generator, SIGNAL(progressChanged(int)), this, SLOT(progressSet(int)));
@@ -168,6 +170,11 @@ int MainWindow::estimatePikiSlot()
 void MainWindow::controllChanged()
 {
     this->controllChangedFlag = true;
+}
+
+void MainWindow::changeChartLayout()
+{
+    this->plotter->changeLayout(PlotSEWidget::LAYOUTS_TYPES::VERTICAL);
 }
 
 int MainWindow::importConfigSlot()

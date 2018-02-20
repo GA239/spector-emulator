@@ -9,11 +9,11 @@
 PlotSEWidget::PlotSEWidget(QWidget *parent, int numberOfPlots) : QWidget(parent)
 {
     customPlotArray.resize(numberOfPlots);
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout = new QGridLayout(this);
 
     for(int index = 0; index < customPlotArray.length(); ++index){
         customPlotArray[index] = new QCustomPlot(this);
-        layout->addWidget(customPlotArray[index]);
+        layout->addWidget(customPlotArray[index],index,0);
         // create graph and assign data to it:
         customPlotArray[index]->addGraph();
 
@@ -70,5 +70,16 @@ void PlotSEWidget::cleanData()
     for(int index = 0; index < customPlotArray.length(); ++index){
         customPlotArray[index]->graph(0)->data()->clear();
         customPlotArray[index]->hide();
+    }
+}
+
+void PlotSEWidget::changeLayout(LAYOUTS_TYPES ltype)
+{
+    for(int index = 0; index < customPlotArray.length(); ++index){
+        layout->removeWidget(customPlotArray[index]);
+        if(ltype == LAYOUTS_TYPES::HORIZONTAL)
+            layout->addWidget(customPlotArray[index],index,0);
+        if(ltype == LAYOUTS_TYPES::VERTICAL)
+            layout->addWidget(customPlotArray[index],0,index);
     }
 }
