@@ -73,6 +73,11 @@ void PlotSEWidget::cleanData()
     }
 }
 
+void PlotSEWidget::changeLayoutSlot(int value)
+{
+    changeLayout((LAYOUTS_TYPES)value);
+}
+
 void PlotSEWidget::changeLayout(LAYOUTS_TYPES ltype)
 {
     for(int index = 0; index < customPlotArray.length(); ++index){

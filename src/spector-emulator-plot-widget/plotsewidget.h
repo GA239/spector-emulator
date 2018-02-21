@@ -25,9 +25,11 @@ public:
     ///
     QSharedPointer<QCPGraphDataContainer> getData(PLOT_NAMES plotName) const;
     void cleanData();
+public slots:
+    void changeLayoutSlot(int);
+private:
     void changeLayout(LAYOUTS_TYPES ltype);
 
-private:
     QVector<QCustomPlot*> customPlotArray;
     QGridLayout *layout;
 };

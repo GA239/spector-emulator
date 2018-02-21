@@ -13,7 +13,8 @@ signals:
 	void buttomNumber(int);
 
 private slots:
-
+    void horBtmPressed();
+    void verBtmPressed();
 
 };
 #endif  //_ChartDialog_h_
