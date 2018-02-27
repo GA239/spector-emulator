@@ -96,13 +96,6 @@ private:
     /// \return - a set of ion flight times, depending on the mass of the gas
     ///
     QVector<double> tof(const Params &param);
-    ///
-    /// \brief timeOfFly - procedure for calculating the flight time of an ion for a given set of parameters
-    /// \param param -
-    /// \return - a set of ion flight times, depending on the mass of the gas
-    ///
-    QVector<double> timeOfFly(const Params &param);
-
     QMap<QModelIndex,QPair<int,double> > gases;
     QStringListModel *model;
     QStringList gasesNames;

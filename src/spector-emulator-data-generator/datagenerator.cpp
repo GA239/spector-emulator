@@ -127,8 +127,7 @@ QVector<QVector<double> > DataGenerator::estemateData(const int u1, const int u2
     for(int j=0; j<nrolls; ++j){
         //estimate the flight time for each ion
         p.x = x[j];
-        //tmp = tof(p);
-        tmp = timeOfFly(p);
+        tmp = tof(p);
         for  (int i=0; i<tmp.length(); ++i){
             if (tmp[i] != 0)
                 y[i].push_back(tmp[i]);
@@ -210,7 +209,6 @@ QVector<double> DataGenerator::tof(const Params &param)
             Tmirr2 = 2 * (2 * ((Uion - param.Um1) / param.Um2 * Lmirr2) / Vmrr);
         }
         result[i] = Ti + Tg1 + Tg2 + Tmirr1 + Tmirr2;
-        qDebug() << "Mass = " << param.M[i] << "Time = " << result[i];
     }
     return result;
 }

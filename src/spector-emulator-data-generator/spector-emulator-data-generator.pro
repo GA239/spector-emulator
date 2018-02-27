@@ -13,8 +13,7 @@ TARGET = DataGeneratorLib
 TEMPLATE = lib
 
 SOURCES += \ 
-    datagenerator.cpp \
-    newdatagenerator.cpp
+    datagenerator.cpp
 
 HEADERS  += \ 
     datagenerator.h \
