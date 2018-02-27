@@ -13,6 +13,8 @@ public:
     ~PlotSEWidget();
 
     enum PLOT_NAMES { SPECTURM, SIGNALS, PEAK, AVG_FILTER, STD_FILTER, FILTERED_DATA, DIMENSION_PLOT_NAMES };
+    enum LAYOUTS_TYPES { HORIZONTAL, VERTICAL};
+
     ///
     /// \brief setPlotData sets values for rendering
     /// \param values - ordinates of the gas spectrum
@@ -23,9 +25,13 @@ public:
     ///
     QSharedPointer<QCPGraphDataContainer> getData(PLOT_NAMES plotName) const;
     void cleanData();
-
+public slots:
+    void changeLayoutSlot(int);
 private:
+    void changeLayout(LAYOUTS_TYPES ltype);
+
     QVector<QCustomPlot*> customPlotArray;
+    QGridLayout *layout;
 };
 
 #endif // PLOTSEWIDGET_H

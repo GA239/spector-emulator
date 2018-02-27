@@ -68,6 +68,7 @@ private slots:
     int saveDataSlot();
     int estimatePikiSlot();
     void controllChanged();
+    void changeChartLayout();
 private:
 
     void createAndConfigureElemtsOfWindow(void);

@@ -15,10 +15,12 @@ TEMPLATE = app
 
 SOURCES +=  main.cpp\
             mainwindow.cpp \
-            countthread.cpp
+            countthread.cpp \
+    chartlayoutdialog.cpp
 
 HEADERS  += mainwindow.h \
-            countthread.h
+            countthread.h \
+    chartlayoutdialog.h
 
 FORMS    += mainwindow.ui
 
