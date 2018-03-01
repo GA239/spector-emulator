@@ -138,7 +138,7 @@ int MainWindow::saveDataSlot()
 
 int MainWindow::estimatePikiSlot()
 {
-    QVector<double> input,output;
+    // get spectrum for estimation
     QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData(PlotSEWidget::PLOT_NAMES::SPECTURM);
     if(data == nullptr){
         QMessageBox messageBox;
@@ -147,15 +147,22 @@ int MainWindow::estimatePikiSlot()
         return _ERROR_WRONG_WORKFLOW_;
     }
 
-    for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter)
-        input.push_back(iter->value);
+    // prepare input data
+    int counter = 0;
+    QVector<double> input(data.data()->size(),0), output;
+    for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter){
+        input[counter] = iter->value;
+        counter++;
+    }
 
+    // estimation
     PeakDetector pd;
     int rc = pd.estimate(input);
 
     if(rc != _RC_SUCCESS_)
         return rc;
 
+    /* get results */
     rc =pd.getEstimateByName(PeakDetector::estimatesTracksNames[PeakDetector::ESTIMATES_NAMES::SIGNALS], output);
     if(rc != _RC_SUCCESS_)
         return rc;
@@ -166,6 +173,7 @@ int MainWindow::estimatePikiSlot()
         return rc;
     this->plotter->setPlotData(output, PlotSEWidget::PLOT_NAMES::PEAK);
 
+    // update plots
     this->update();
     return _RC_SUCCESS_;
 }
@@ -178,7 +186,6 @@ void MainWindow::controllChanged()
 void MainWindow::changeChartLayout()
 {
 
-    //ChartDialog dlg = new ChartDialog();
     ChartDialog dlg;
     connect(&dlg, SIGNAL(buttomNumber(int)) , this->plotter, SLOT(changeLayoutSlot(int)) );
     dlg.exec();
@@ -287,13 +294,13 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     font.setPointSize( 22 );
     font.setWeight( QFont::Bold );
     this->startEstimateBottom->setFont(font );
-    this->startEstimateBottom->setText("Estimate");
+    this->startEstimateBottom->setText("Spectrum");
     this->startEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
 
     this->pikiEstimateBottom = new QPushButton();
     this->pikiEstimateBottom->setFont(font );
-    this->pikiEstimateBottom->setText("Piki");
+    this->pikiEstimateBottom->setText("Peaks");
     this->pikiEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     QObject::connect(this->pikiEstimateBottom, SIGNAL(clicked()), this, SLOT(estimatePikiSlot()));
 }

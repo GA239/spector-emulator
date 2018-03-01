@@ -66,8 +66,16 @@ private slots:
     /// \return
     ///
     int saveDataSlot();
+    ///
+    /// \brief estimate peaks of spectrum;
+    /// \return
+    ///
     int estimatePikiSlot();
     void controllChanged();
+    ///
+    /// \brief switch plots layout
+    /// \return
+    ///
     void changeChartLayout();
 private:
 
