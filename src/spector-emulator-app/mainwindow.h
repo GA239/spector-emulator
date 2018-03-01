@@ -70,7 +70,7 @@ private slots:
     /// \brief estimate peaks of spectrum;
     /// \return
     ///
-    int estimatePikiSlot();
+    int estimatePeaksSlot();
     void controllChanged();
     ///
     /// \brief switch plots layout

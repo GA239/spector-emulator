@@ -136,7 +136,7 @@ int MainWindow::saveDataSlot()
     return exportData(str);
 }
 
-int MainWindow::estimatePikiSlot()
+int MainWindow::estimatePeaksSlot()
 {
     // get spectrum for estimation
     QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData(PlotSEWidget::PLOT_NAMES::SPECTURM);
@@ -302,7 +302,7 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     this->pikiEstimateBottom->setFont(font );
     this->pikiEstimateBottom->setText("Peaks");
     this->pikiEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
-    QObject::connect(this->pikiEstimateBottom, SIGNAL(clicked()), this, SLOT(estimatePikiSlot()));
+    QObject::connect(this->pikiEstimateBottom, SIGNAL(clicked()), this, SLOT(estimatePeaksSlot()));
 }
 
 void MainWindow::setwidgetAssembly()
