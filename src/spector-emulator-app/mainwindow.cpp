@@ -25,6 +25,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction *chartChange = this->ui->mainToolBar->addAction(QIcon("resourses/chart.png"), "Change chart");
     connect(chartChange, SIGNAL(triggered()), this, SLOT(changeChartLayout()));
 
+    QFile styleSheet("resourses/style_sheets/stylesheet.qss");
+
+    if (!styleSheet.open(QIODevice::ReadOnly)) {
+        qWarning("Unable to open stylesheet.qss");
+        return;
+    }
+    qApp->setStyleSheet(styleSheet.readAll());
 }
 
 MainWindow::~MainWindow()

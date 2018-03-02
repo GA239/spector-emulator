@@ -53,7 +53,6 @@ public:
     /// \param gaseList - list of gas names
     ///
     void addTags(QStringList gaseList);
-
 signals:
     ///
     /// \brief Changed signals a widget change
