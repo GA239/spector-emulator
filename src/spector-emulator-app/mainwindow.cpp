@@ -13,8 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->createAndConfigureElemtsOfWindow();
     this->setwidgetAssembly();
-    this->setWindowTitle("spector-emulator");
-    this->setMinimumSize(qApp->desktop()->height()/4*3/3*4, qApp->desktop()->height()/4*3);
+    this->setWindowTitle("spectrum-emulator");
+    this->setMinimumSize(0.8 * (qApp->desktop()->width()), (0.8 * (qApp->desktop()->height())));
 
     QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon("resourses/export.png"), "Export Config");
     connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfigSlot()));
@@ -26,10 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(chartChange, SIGNAL(triggered()), this, SLOT(changeChartLayout()));
 
     QFile styleSheet("resourses/style_sheets/stylesheet.qss");
-
     if (!styleSheet.open(QIODevice::ReadOnly)) {
         qWarning("Unable to open stylesheet.qss");
-        return;
     }
     qApp->setStyleSheet(styleSheet.readAll());
 }
@@ -297,16 +295,11 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     this->progressBar->hide();
 
     this->startEstimateBottom = new QPushButton();
-    QFont font( "Times" );
-    font.setPointSize( 22 );
-    font.setWeight( QFont::Bold );
-    this->startEstimateBottom->setFont(font );
     this->startEstimateBottom->setText("Spectrum");
     this->startEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
 
     this->pikiEstimateBottom = new QPushButton();
-    this->pikiEstimateBottom->setFont(font );
     this->pikiEstimateBottom->setText("Peaks");
     this->pikiEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     QObject::connect(this->pikiEstimateBottom, SIGNAL(clicked()), this, SLOT(estimatePeaksSlot()));
@@ -315,7 +308,7 @@ void MainWindow::createAndConfigureElemtsOfWindow()
 void MainWindow::setwidgetAssembly()
 {
     QGridLayout *layout = new QGridLayout();
-    layout->addWidget(this->controll,0,0);
+    layout->addWidget(this->controll,0,0,2,1);
     layout->addWidget(this->plotter,0,1,2,3);
     layout->addWidget(this->startEstimateBottom,2,0);
     layout->addWidget(this->pikiEstimateBottom,2,1);
@@ -345,7 +338,7 @@ void MainWindow::stopEstimate()
 void MainWindow::updateProgressbar()
 {
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
-    this->startEstimateBottom->setText("Estimate");
+    this->startEstimateBottom->setText("Spectrum");
     this->progressBar->hide();
 }
 

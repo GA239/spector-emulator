@@ -15,7 +15,7 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
     QGridLayout *layout = new QGridLayout(this);
     for(int i = 0; i < U_NUMBER; ++i){
         // add scroll bar for each gas
-        QScrollBar* sb = new QScrollBar(Qt::Horizontal,parent);
+        QSlider* sb = new QSlider(Qt::Horizontal,parent);
         this->U.push_back(sb);
         this->U[i]->setRange(U_MIN_VALUE,U_MAX_VALUE);
         this->U[i]->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
@@ -33,8 +33,8 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 
     ///* search widget *///
     this->searchWidget = new SearchWidget();
-    this->searchWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    layout->addWidget(this->searchWidget,U_NUMBER,0,1,2);
+    this->searchWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    layout->addWidget(this->searchWidget,U_NUMBER,0,10,2);
 }
 
 /**
@@ -57,9 +57,7 @@ int ControllSEWidget::getU(int index)
 }
 QString ControllSEWidget::getValueStrForUBar(int uIndex, int value)
 {
-    float font = 12;
-    QString result = "<font size=" + QString::number(font) + "><b>U" + QString::number(uIndex) + " = " + QString::number(value) + "</b></font>";
-    return result;
+    return  "U" + QString::number(uIndex) + " = " + QString::number(value);
 }
 
 void ControllSEWidget::updateULables(int value)
