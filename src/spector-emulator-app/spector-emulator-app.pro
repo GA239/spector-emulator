@@ -42,3 +42,6 @@ CONFIG(release, debug|release) {
 
 }
 RC_FILE     = resources.rc
+
+RESOURCES += \
+    app_resources.qrc

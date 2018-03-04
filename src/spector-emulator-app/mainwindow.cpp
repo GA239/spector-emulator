@@ -16,16 +16,16 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowTitle("spectrum-emulator");
     this->setMinimumSize(0.8 * (qApp->desktop()->width()), (0.8 * (qApp->desktop()->height())));
 
-    QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon("resourses/export.png"), "Export Config");
+    QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon(":/images/export.png"), "Export Config");
     connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfigSlot()));
-    QAction *importConfig = this->ui->mainToolBar->addAction(QIcon("resourses/import.png"), "Import Config");
+    QAction *importConfig = this->ui->mainToolBar->addAction(QIcon(":/images/import.png"), "Import Config");
     connect(importConfig, SIGNAL(triggered()), this, SLOT(importConfigSlot()));
-    QAction *saveData = this->ui->mainToolBar->addAction(QIcon("resourses/save.png"), "Save Data");
+    QAction *saveData = this->ui->mainToolBar->addAction(QIcon(":/images/save.png"), "Save Data");
     connect(saveData, SIGNAL(triggered()), this, SLOT(saveDataSlot()));
-    QAction *chartChange = this->ui->mainToolBar->addAction(QIcon("resourses/chart.png"), "Change chart");
+    QAction *chartChange = this->ui->mainToolBar->addAction(QIcon(":/images/chart.png"), "Change chart");
     connect(chartChange, SIGNAL(triggered()), this, SLOT(changeChartLayout()));
 
-    QFile styleSheet("resourses/style_sheets/stylesheet.qss");
+    QFile styleSheet(":/styles/stylesheet.qss");
     if (!styleSheet.open(QIODevice::ReadOnly)) {
         qWarning("Unable to open stylesheet.qss");
     }

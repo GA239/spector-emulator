@@ -29,8 +29,6 @@ xcopy %windeployqtdir%\libgcc_s_dw2-1.dll %deploy_src_dir%
 xcopy %windeployqtdir%\libwinpthread-1.dll %deploy_src_dir%
 
 xcopy spector-emulator\libs\libqt-searchwidget\release\searchwidget.dll %deploy_src_dir%
-mkdir %deploy_src_dir%\resourses
-xcopy %~dp0resourses %deploy_src_dir%\resourses
 
 xcopy spector-emulator\deploy\install.ico %deployir%
 
