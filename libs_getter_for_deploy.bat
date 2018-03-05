@@ -1,4 +1,4 @@
-@echo Off
+rem @echo Off
 set windeployqtdir=%1
 set ISSOdir=%2
 
@@ -32,6 +32,8 @@ xcopy spector-emulator\libs\libqt-searchwidget\release\searchwidget.dll %deploy_
 
 xcopy spector-emulator\deploy\install.ico %deployir%
 
+
+%windeployqtdir:~0,1%:
 cd %windeployqtdir%
 windeployqt.exe --release %deploy_src_dir%\ControllSEWidget.dll
 windeployqt.exe --release %deploy_src_dir%\PlotSEWidget.dll
@@ -39,8 +41,8 @@ windeployqt.exe --release %deploy_src_dir%\PeakDetectorLib.dll
 windeployqt.exe --release %deploy_src_dir%\DataGeneratorLib.dll
 windeployqt.exe --release %deploy_src_dir%\spector-emulator.exe
 
+%deployir:~0,1%:
 cd %deployir%
-
 ECHO #define MyAppName "Spector Emulator" >> script.iss
 ECHO #define MyAppVersion "1.0" >> script.iss
 ECHO #define MyAppPublisher "Gavrilov A.O." >> script.iss
@@ -83,6 +85,7 @@ ECHO Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"
 ECHO [Run] >> script.iss
 ECHO Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent >> script.iss
 
+%ISSOdir:~0,1%:
 %ISSOdir%\ISCC.exe  %deployir%\script.iss
 
 cd %~dp0
