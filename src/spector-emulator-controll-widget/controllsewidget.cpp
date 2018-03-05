@@ -2,8 +2,9 @@
 #include <QGridLayout>
 #include "controllsewidget.h"
 
-#define U_MIN_VALUE 200
-#define U_MAX_VALUE 999
+#define U_MIN_VALUE 0
+#define U_1_MAX_VALUE 400
+#define U_MAX_VALUE 600
 #define U_NUMBER 3
 
 /**
@@ -13,6 +14,8 @@
 ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
 {
     QGridLayout *layout = new QGridLayout(this);
+    // add label bar for each gas
+
     for(int i = 0; i < U_NUMBER; ++i){
         // add scroll bar for each gas
         QSlider* sb = new QSlider(Qt::Horizontal,parent);
@@ -30,11 +33,22 @@ ControllSEWidget::ControllSEWidget(QWidget *parent) : QWidget(parent)
         layout->addWidget(this->U[i],i,0);
         layout->addWidget(this->ULable[i],i,1);
     }
+    this->U[0]->setRange(U_MIN_VALUE,U_1_MAX_VALUE);
+    this->ULable[0]->setToolTip("Front reflective voltage");
+    this->ULable[1]->setToolTip("Back reflective voltage");
+    this->ULable[2]->setToolTip("Ion valve voltage");
 
     ///* search widget *///
     this->searchWidget = new SearchWidget();
     this->searchWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    this->searchWidget->setToolTip("Set of gases");
     layout->addWidget(this->searchWidget,U_NUMBER,0,10,2);
+
+    QVector<int> defaultValues(3,0);
+    defaultValues[0] = 258;
+    defaultValues[1] = 357;
+    defaultValues[2] = 221;
+    setUvalues(defaultValues);
 }
 
 /**
@@ -57,6 +71,8 @@ int ControllSEWidget::getU(int index)
 }
 QString ControllSEWidget::getValueStrForUBar(int uIndex, int value)
 {
+    if(uIndex == U_NUMBER)
+        return  "Uik = " + QString::number(value);
     return  "U" + QString::number(uIndex) + " = " + QString::number(value);
 }
 
