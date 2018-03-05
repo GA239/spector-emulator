@@ -62,12 +62,12 @@ void PlotSEWidget::setPlotData(QVector<double> values, PLOT_NAMES plotName)
 
 QSharedPointer<QCPGraphDataContainer> PlotSEWidget::getData(PLOT_NAMES plotName) const
 {
-    /*
+
     if(customPlotArray.length() <= plotName)
         return nullptr;
     if(customPlotArray[plotName]->isHidden())
         return nullptr;
-    */
+
     return customPlotArray[plotName]->graph(0)->data();
 }
 

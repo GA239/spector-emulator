@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->createAndConfigureElemtsOfWindow();
     this->setwidgetAssembly();
     this->setWindowTitle("spectrum-emulator");
-    this->setMinimumSize(0.8 * (qApp->desktop()->width()), (0.8 * (qApp->desktop()->height())));
+    //this->setMinimumSize(0.8 * (qApp->desktop()->width()), (0.8 * (qApp->desktop()->height())));
 
     QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon(":/images/export.png"), "Export Config");
     connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfigSlot()));
