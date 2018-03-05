@@ -16,12 +16,33 @@ PlotSEWidget::PlotSEWidget(QWidget *parent, int numberOfPlots) : QWidget(parent)
         layout->addWidget(customPlotArray[index],index,0);
         // create graph and assign data to it:
         customPlotArray[index]->addGraph();
-
+        customPlotArray[index]->xAxis->setLabel("Time (ns)");
         // give the axes some labels:
-        //customPlotArray[index]->xAxis->setLabel("x");
-        //customPlotArray[index]->yAxis->setLabel("y");
         customPlotArray[index]->hide();
+
+        customPlotArray[index]->legend->setVisible(true);
+        customPlotArray[index]->legend->setBrush(QBrush(QColor(255,255,255,230)));
+        customPlotArray[index]->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
+
     }
+    customPlotArray[PLOT_NAMES::SPECTURM]->yAxis->setLabel("Amplitude (number of ions)");
+    customPlotArray[PLOT_NAMES::SPECTURM]->graph(0)->setName("Spectrum");
+    customPlotArray[PLOT_NAMES::SPECTURM]->graph(0)->setPen(QPen(QColor(0, 0, 255)));
+    customPlotArray[PLOT_NAMES::SPECTURM]->graph(0)->setLineStyle(QCPGraph::lsLine);
+
+    customPlotArray[PLOT_NAMES::SIGNALS]->yAxis->setLabel("Indicator");
+    customPlotArray[PLOT_NAMES::SIGNALS]->graph(0)->setName("Peak width");
+    QPen pen;
+    pen.setColor(QColor(0, 0, 255, 250));
+    pen.setStyle(Qt::DotLine);
+    pen.setWidthF(1.5);
+    customPlotArray[PLOT_NAMES::SIGNALS]->graph(0)->setPen(pen);
+//    customPlotArray[PLOT_NAMES::SIGNALS]->graph(0)->setPen(QPen(QColor(0, 0, 255)));
+
+    customPlotArray[PLOT_NAMES::PEAK]->yAxis->setLabel("Indicator");
+    customPlotArray[PLOT_NAMES::PEAK]->graph(0)->setName("Peak position (by amplitude)");
+    customPlotArray[PLOT_NAMES::PEAK]->graph(0)->setPen(QPen(QColor(255, 0, 0)));
+
 }
 
 /**
@@ -56,6 +77,7 @@ void PlotSEWidget::setPlotData(QVector<double> values, PLOT_NAMES plotName)
     customPlotArray[plotName]->yAxis->setRange(0, maximum);
 
     customPlotArray[plotName]->graph(0)->setData(rx, ry);
+
     customPlotArray[plotName]->replot();
     customPlotArray[plotName]->show();
 }
