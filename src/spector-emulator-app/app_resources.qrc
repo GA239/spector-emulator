@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="chart.png">resources/img/chart.png</file>
+        <file alias="export.png">resources/img/export.png</file>
+        <file alias="horizontal.png">resources/img/horizontal.png</file>
+        <file alias="import.png">resources/img/import.png</file>
+        <file alias="save.png">resources/img/save.png</file>
+        <file alias="vertical.png">resources/img/vertical.png</file>
+    </qresource>
+    <qresource prefix="/styles">
+        <file alias="stylesheet.qss">resources/style_sheets/stylesheet.qss</file>
+    </qresource>
+</RCC>

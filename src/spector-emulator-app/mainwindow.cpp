@@ -13,18 +13,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->createAndConfigureElemtsOfWindow();
     this->setwidgetAssembly();
-    this->setWindowTitle("spector-emulator");
-    this->setMinimumSize(qApp->desktop()->height()/4*3/3*4, qApp->desktop()->height()/4*3);
+    this->setWindowTitle("spectrum-emulator");
+    //this->setMinimumSize(0.8 * (qApp->desktop()->width()), (0.8 * (qApp->desktop()->height())));
 
-    QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon("resourses/export.png"), "Export Config");
+    QAction *exportConfig = this->ui->mainToolBar->addAction(QIcon(":/images/export.png"), "Export Config");
     connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfigSlot()));
-    QAction *importConfig = this->ui->mainToolBar->addAction(QIcon("resourses/import.png"), "Import Config");
+    QAction *importConfig = this->ui->mainToolBar->addAction(QIcon(":/images/import.png"), "Import Config");
     connect(importConfig, SIGNAL(triggered()), this, SLOT(importConfigSlot()));
-    QAction *saveData = this->ui->mainToolBar->addAction(QIcon("resourses/save.png"), "Save Data");
+    QAction *saveData = this->ui->mainToolBar->addAction(QIcon(":/images/save.png"), "Save Data");
     connect(saveData, SIGNAL(triggered()), this, SLOT(saveDataSlot()));
-    QAction *chartChange = this->ui->mainToolBar->addAction(QIcon("resourses/chart.png"), "Change chart");
+    QAction *chartChange = this->ui->mainToolBar->addAction(QIcon(":/images/chart.png"), "Change chart");
     connect(chartChange, SIGNAL(triggered()), this, SLOT(changeChartLayout()));
 
+    QFile styleSheet(":/styles/stylesheet.qss");
+    if (!styleSheet.open(QIODevice::ReadOnly)) {
+        qWarning("Unable to open stylesheet.qss");
+    }
+    qApp->setStyleSheet(styleSheet.readAll());
 }
 
 MainWindow::~MainWindow()
@@ -136,9 +141,9 @@ int MainWindow::saveDataSlot()
     return exportData(str);
 }
 
-int MainWindow::estimatePikiSlot()
+int MainWindow::estimatePeaksSlot()
 {
-    QVector<double> input,output;
+    // get spectrum for estimation
     QSharedPointer<QCPGraphDataContainer> data = this->plotter->getData(PlotSEWidget::PLOT_NAMES::SPECTURM);
     if(data == nullptr){
         QMessageBox messageBox;
@@ -147,15 +152,22 @@ int MainWindow::estimatePikiSlot()
         return _ERROR_WRONG_WORKFLOW_;
     }
 
-    for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter)
-        input.push_back(iter->value);
+    // prepare input data
+    int counter = 0;
+    QVector<double> input(data.data()->size(),0), output;
+    for(auto iter = data.data()->begin(); iter != data.data()->end(); ++iter){
+        input[counter] = iter->value;
+        counter++;
+    }
 
+    // estimation
     PeakDetector pd;
     int rc = pd.estimate(input);
 
     if(rc != _RC_SUCCESS_)
         return rc;
 
+    /* get results */
     rc =pd.getEstimateByName(PeakDetector::estimatesTracksNames[PeakDetector::ESTIMATES_NAMES::SIGNALS], output);
     if(rc != _RC_SUCCESS_)
         return rc;
@@ -166,6 +178,7 @@ int MainWindow::estimatePikiSlot()
         return rc;
     this->plotter->setPlotData(output, PlotSEWidget::PLOT_NAMES::PEAK);
 
+    // update plots
     this->update();
     return _RC_SUCCESS_;
 }
@@ -178,7 +191,6 @@ void MainWindow::controllChanged()
 void MainWindow::changeChartLayout()
 {
 
-    //ChartDialog dlg = new ChartDialog();
     ChartDialog dlg;
     connect(&dlg, SIGNAL(buttomNumber(int)) , this->plotter, SLOT(changeLayoutSlot(int)) );
     dlg.exec();
@@ -283,25 +295,20 @@ void MainWindow::createAndConfigureElemtsOfWindow()
     this->progressBar->hide();
 
     this->startEstimateBottom = new QPushButton();
-    QFont font( "Times" );
-    font.setPointSize( 22 );
-    font.setWeight( QFont::Bold );
-    this->startEstimateBottom->setFont(font );
-    this->startEstimateBottom->setText("Estimate");
+    this->startEstimateBottom->setText("Spectrum");
     this->startEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
 
     this->pikiEstimateBottom = new QPushButton();
-    this->pikiEstimateBottom->setFont(font );
-    this->pikiEstimateBottom->setText("Piki");
+    this->pikiEstimateBottom->setText("Peaks");
     this->pikiEstimateBottom->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
-    QObject::connect(this->pikiEstimateBottom, SIGNAL(clicked()), this, SLOT(estimatePikiSlot()));
+    QObject::connect(this->pikiEstimateBottom, SIGNAL(clicked()), this, SLOT(estimatePeaksSlot()));
 }
 
 void MainWindow::setwidgetAssembly()
 {
     QGridLayout *layout = new QGridLayout();
-    layout->addWidget(this->controll,0,0);
+    layout->addWidget(this->controll,0,0,2,1);
     layout->addWidget(this->plotter,0,1,2,3);
     layout->addWidget(this->startEstimateBottom,2,0);
     layout->addWidget(this->pikiEstimateBottom,2,1);
@@ -331,7 +338,7 @@ void MainWindow::stopEstimate()
 void MainWindow::updateProgressbar()
 {
     QObject::connect(this->startEstimateBottom, SIGNAL(clicked()), this, SLOT(EstimateBottomPressed()));
-    this->startEstimateBottom->setText("Estimate");
+    this->startEstimateBottom->setText("Spectrum");
     this->progressBar->hide();
 }
 

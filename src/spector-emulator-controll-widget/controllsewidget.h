@@ -53,7 +53,6 @@ public:
     /// \param gaseList - list of gas names
     ///
     void addTags(QStringList gaseList);
-
 signals:
     ///
     /// \brief Changed signals a widget change
@@ -69,7 +68,7 @@ private slots:
 private:
     QString getValueStrForUBar(int uIndex, int value);
 
-    QVector<QScrollBar*> U;
+    QVector<QSlider*> U;
     QVector<QLabel*> ULable;
     SearchWidget *searchWidget;
 };

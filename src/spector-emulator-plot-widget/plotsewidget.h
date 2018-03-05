@@ -29,6 +29,7 @@ public slots:
     void changeLayoutSlot(int);
 private:
     void changeLayout(LAYOUTS_TYPES ltype);
+    void interpolation(QVector<double> &x, QVector<double> &y, QVector<double> &rx, QVector<double> &ry);
 
     QVector<QCustomPlot*> customPlotArray;
     QGridLayout *layout;

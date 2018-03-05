@@ -38,7 +38,10 @@ CONFIG(release, debug|release) {
     LIBS+= -L../spector-emulator-plot-widget/release -lPlotSEWidget
     LIBS+= -L../spector-emulator-data-generator/release -lDataGeneratorLib
     LIBS+= -L../spector-emulator-peak-detector/release -lPeakDetectorLib
-    LIBS+= -L../../../../spector-emulator/libs/libqt-searchwidget/release -lsearchwidget
+    LIBS+= -L../../../spector-emulator/libs/libqt-searchwidget/release -lsearchwidget
 
 }
 RC_FILE     = resources.rc
+
+RESOURCES += \
+    app_resources.qrc
